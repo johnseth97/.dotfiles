@@ -1,3 +1,6 @@
+[core]
+  editor = nvim
+
 [user]
 	name = Deso
 	email = 17620345+desojo@users.noreply.github.com
