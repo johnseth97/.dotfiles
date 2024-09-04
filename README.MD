@@ -1,4 +1,4 @@
-## MacOS bootstraping 🥾
+## MacOS bootstraping/Easy Dotfiles
 
 1. Install Apple's Command Line Tools, which are prerequisites for Git and Homebrew
 
@@ -40,10 +40,10 @@ cd ~/.dotfiles
 # View the changes
 git diff
 
-# Add the changes
+# Add a changed file
 git add <filename>
 
-# Or, remove the changes
+# Or, remove a changed file
 git rm <filename>
 
 # Commit the changes
