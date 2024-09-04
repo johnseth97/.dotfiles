@@ -2,8 +2,8 @@
   editor = vim
 
 [user]
-	name = Deso
-	email = 17620345+desojo@users.noreply.github.com
+	name = johnseth97
+	email = 17620345+johnseth97@users.noreply.github.com
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
