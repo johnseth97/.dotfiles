@@ -70,7 +70,16 @@ ZSH_THEME="fino-time"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=( 
+	
+	fast-syntax-highlighting
+	git
+	you-should-use
+	zsh-autocomplete
+	zsh-autosuggestions
+	zsh-syntax-highlighting
+		
+)
 
 source $ZSH/oh-my-zsh.sh
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
