@@ -12,6 +12,9 @@ filetype plugin on
 " Load an indent file for the detected file type.
 filetype indent on
 
+" Enable modeline
+set modelines=1
+
 " Turn syntax highlighting on.
 syntax on
 
