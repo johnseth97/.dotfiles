@@ -1,0 +1,11 @@
+
+//Ignoring unneeded files in .config
+
+.config/.DS_Store
+.config/Autodesk/
+.config/OpenVPN/
+.config/coc/
+.config/gtk-2.0/
+.config/iterm2/
+.config/sketchybar/
+.config/wireshark/
