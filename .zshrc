@@ -3,9 +3,6 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# User Binaries
-export PATH=$PATH:~/.bin
-
 # iTerm2 Plugins
 export PATH=$PATH:~/.iterm2
 
