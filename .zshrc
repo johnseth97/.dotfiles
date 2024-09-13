@@ -3,6 +3,12 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# User Binaries
+export PATH=$PATH:~/.bin
+
+# iTerm2 Plugins
+export PATH=$PATH:~/.iterm2
+
 # Theme (see https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 ZSH_THEME="fino-time"
 
