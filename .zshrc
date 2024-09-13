@@ -6,6 +6,10 @@ export ZSH="$HOME/.oh-my-zsh"
 # iTerm2 Plugins
 export PATH=$PATH:~/.iterm2
 
+# git GPG support
+GPG_TTY=$(tty)
+export GPG_TTY
+
 # Theme (see https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 ZSH_THEME="fino-time"
 
@@ -34,6 +38,7 @@ ENABLE_CORRECTION="true"
 plugins=( 
 	git
 	zsh-autosuggestions
+	colored-man-pages
 	zsh-syntax-highlighting
 	you-should-use
 )
