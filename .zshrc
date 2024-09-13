@@ -30,6 +30,9 @@ ENABLE_CORRECTION="true"
 # Zsh builtin plugins
 plugins=( 
 	git
+	zsh-autosuggestions
+	zsh-syntax-highlighting
+	you-should-use
 )
 
 
@@ -38,11 +41,10 @@ source $ZSH/oh-my-zsh.sh
 
 
 # Homebrew plugins
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-source $(brew --prefix)/share/zsh-you-should-use/you-should-use.plugin.zsh
-
-# ------------------------- }}}
+# source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# source $(brew --prefix)/share/zsh-you-should-use/you-should-use.plugin.zsh
+# ------------------------- }}}zo
 
 
 # ALIASES -------------------- {{{ 

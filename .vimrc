@@ -52,8 +52,10 @@ Plug 'sheerun/vim-polyglot'
 Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
+" Use release branch (recommended)dd
 
 " AIRLINE 
 let g:airline_powerline_fonts = 1
