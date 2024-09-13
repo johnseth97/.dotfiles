@@ -55,9 +55,6 @@ alias zshedit="vim ~/.zshrc"
 # Edit .vimrc
 alias vimedit="vim ~/.vimrc"
 
-# Synchronize dotfile changes
-alias sync-dotfiles="~/.dotfiles/.bin/sync.sh"
-
 # -------------------- }}}
 
 # Vim modeline
