@@ -45,6 +45,7 @@ set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx
 
 " PLUGINS ---------------------------------------------------------------- {{{ 
 
+" VIM-PLUG -------------------- {{{
 call plug#begin()
 
 Plug 'tpope/vim-sensible'
@@ -53,15 +54,45 @@ Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'tpope/vim-fugitive'
 
 call plug#end()
 " Use release branch (recommended)dd
+" }}}
 
-" AIRLINE 
+" CoC Config ------------------------ {{{
+
+" Let enter select suggestions
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" }}}
+
+" AIRLINE -------------------------- {{{
+
+" Enable Powerline Fonts
 let g:airline_powerline_fonts = 1
 
 " Airline Theme
 let g:airline_theme='deus'
+
+ if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+  endif
+
+" airline symbols
+  let g:airline_left_sep = ''
+  let g:airline_left_alt_sep = ''
+  let g:airline_right_sep = ''
+  let g:airline_right_alt_sep = ''
+  let g:airline_symbols.branch = ''
+  let g:airline_symbols.colnr = ' ℅:'
+  let g:airline_symbols.readonly = ''
+  let g:airline_symbols.linenr = ' :'
+  let g:airline_symbols.maxlinenr = '☰ '
+  let g:airline_symbols.dirty='⚡'
+
+  "}}}
+
 
 " }}} 
 

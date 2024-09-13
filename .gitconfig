@@ -4,8 +4,11 @@
 [user]
 	name = johnseth97
 	email = 17620345+johnseth97@users.noreply.github.com
+	signingkey = 65C344A1B563937C
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[commit]
+	gpgsign = true
