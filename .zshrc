@@ -58,10 +58,13 @@ source $ZSH/oh-my-zsh.sh
 # ALIASES -------------------- {{{ 
 
 # Edit .zshrc
-alias zshedit="vim ~/.zshrc"
+alias zshedit="nvim ~/.zshrc"
 
-# Edit .vimrc
-alias vimedit="vim ~/.vimrc"
+# Edit Neovim init.lua
+alias vimedit="vim ~/.config/nvim/init.lua"
+
+# Alias Vim to Neovim
+alias vim="neovim"
 
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
