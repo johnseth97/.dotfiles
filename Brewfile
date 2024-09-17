@@ -1,3 +1,7 @@
+#Casks
+tap "font-im-writing-nerd-font"
+tap "buo/cask-upgrade"
+
 # Bootstrap essentials
 brew "stow"
 brew "zsh"
@@ -6,4 +10,5 @@ brew "zsh"
 brew "visual-studio-code"
 brew "htop"
 brew "neofetch"
+
 
