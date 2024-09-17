@@ -7,11 +7,11 @@ export ZSH="$HOME/.oh-my-zsh"
 export PATH=$PATH:~/.iterm2
 
 # git GPG support
-GPG_TTY=$(tty)
-export GPG_TTY
+#GPG_TTY=$(tty)
+#export GPG_TTY
 
 # Theme (see https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
-ZSH_THEME="fino-time"
+ZSH_THEME="spaceship"
 
 # Case sensitive completeion
 CASE_SENSITIVE="false"
@@ -63,6 +63,8 @@ alias zshedit="vim ~/.zshrc"
 # Edit .vimrc
 alias vimedit="vim ~/.vimrc"
 
+# Point pinentry to pinentry-mac
+#alias pinentry='pinentry-mac'
 # -------------------- }}}
 
 # Vim modeline
