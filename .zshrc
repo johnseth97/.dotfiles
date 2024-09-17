@@ -64,7 +64,7 @@ alias zshedit="nvim ~/.zshrc"
 alias vimedit="vim ~/.config/nvim/init.lua"
 
 # Alias Vim to Neovim
-alias vim="neovim"
+alias vim="nvim"
 
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
