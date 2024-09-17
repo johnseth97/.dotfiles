@@ -1,5 +1,6 @@
 
 //Ignoring unneeded files in .config
+
 .config/nvim.bak/
 
 .config/.DS_Store
