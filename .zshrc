@@ -69,6 +69,9 @@ alias vimedit="vim ~/.config/nvim/init.lua"
 # Edit nix flake
 alias nixedit="vim ~/nix/flake.nix"
 
+# Rebuild Nix darwin
+alias nixrebuild="darwin-rebuild switch --flake ~/nix#MacbookPro"
+
 # Alias Vim to Neovim
 alias vim="nvim"
 
