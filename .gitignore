@@ -2,7 +2,8 @@
 //Ignoring unneeded files in .config
 
 .config/nvim.bak/
-
+.config/btop/
+.config/fontforge/
 .config/.DS_Store
 .config/Autodesk/
 .config/OpenVPN/
