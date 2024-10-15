@@ -3,6 +3,9 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Path to homebrew
+export PATH="/opt/homebrew/bin:$PATH"
+
 # iTerm2 Plugins
 export PATH=$PATH:~/.iterm2
 
@@ -62,6 +65,9 @@ alias zshedit="nvim ~/.zshrc"
 
 # Edit Neovim init.lua
 alias vimedit="vim ~/.config/nvim/init.lua"
+
+# Edit nix flake
+alias nixedit="vim ~/nix/flake.nix"
 
 # Alias Vim to Neovim
 alias vim="nvim"
