@@ -1,0 +1,45 @@
+#for this to work you must configure sudo such that
+# it will be able to run the command without password
+
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# Default Layout as Binary Space Partitioning
+yabai -m config layout bsp
+
+# New window spawns to the right if vertical split, or bottom if horizontal split
+yabai -m config window_placement second_child
+
+
+# Mouse settings
+#
+# mouse modifier: none, cmd, alt, ctrl, shift
+yabaiconfig mouse_modifier alt
+
+# Mouse actions
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+
+# Swap windows with mouse
+yabai -m  mouse_drop_action swap
+
+# Mouse follows focus
+yabai -m config mouse_follows_focus on
+
+
+# Visual settings
+#
+# Padding
+yabai -m config top_padding    12
+yabai -m config bottom_padding 12
+yabai -m config left_padding   12
+yabai -m config right_padding  12
+yabai -m config window_gap     12
+
+# Sketchybar pad
+yabai -m config external_bar all:20:20
+
+# Exclusions
+#
+yabai -m rule --add app="^System Settings$" manage=off
+yabai -m rule --add app="^Calculator$" manage=off
