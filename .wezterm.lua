@@ -16,7 +16,7 @@ config.window_decorations = "RESIZE"
 config.hide_tab_bar_if_only_one_tab = true
 
 -- Color schemes
-config.color_scheme = "tokyonight_night"
+config.color_scheme = "BlulocoDark"
 config.window_background_opacity = 1.0
 
 -- and finally, return the configuration to wezterm

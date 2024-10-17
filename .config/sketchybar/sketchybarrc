@@ -75,7 +75,7 @@ sketchybar --default "${default[@]}"
 sketchybar --add item command.logo left                                                                     \
            --set      command.logo background.color=$COLOR_BACKGROUND                                       \
                                    icon=$ICON_CAT                                                           \
-                                   icon.color=$COLOR_RED                                                    \
+                                   icon.color=$COLOR_BLUE                                                   \
                                    icon.padding_left=$PADDING_L                                             \
                                    icon.padding_right=$PADDING_R                                            \
                                    padding_left=0                                                           \
