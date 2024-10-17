@@ -75,6 +75,9 @@ alias nixrebuild="darwin-rebuild switch --flake ~/nix#MacbookPro"
 # Alias Vim to Neovim
 alias vim="nvim"
 
+# Alias to sync dotfiles
+alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
+
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
 # -------------------- }}}
