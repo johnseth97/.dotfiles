@@ -1,5 +1,8 @@
 # SETTINGS ------------------------- {{{
 
+# Ghostty in the shell
+export PATH=$PATH:/Applications/Ghostty.app/Contents/MacOS/
+
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
