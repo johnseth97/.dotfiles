@@ -174,11 +174,12 @@ sketchybar --add item clock right                              \
            --add item wifi right                               \
            --set wifi    script="$PLUGIN_DIR/wifi.sh"          \
                          icon=                                \
+                         update_freq=10                        \
            --subscribe wifi wifi_change
 
 sketchybar --add bracket one clock wifi \
            --set         one background.color=$COLOR_BACKGROUND \
-                                  background.drawing=on
+                         background.drawing=on
 
 # Separator
 sketchybar --add item seperator.r2 right                  \
