@@ -4,7 +4,7 @@
 export PATH=$PATH:/Applications/Ghostty.app/Contents/MacOS/
 
 # Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# export ZSH="$HOME/.oh-my-zsh"
 
 # Path to homebrew
 export PATH="/opt/homebrew/bin:$PATH"
@@ -26,10 +26,10 @@ CASE_SENSITIVE="false"
 HYPHEN_INSENSITIVE="true"
 
 # Auto update behavior (disabled | auto | reminder)
-zstyle ':omz:update' mode reminder
+#zstyle ':omz:update' mode reminder
 
 # Auto-update frequency in days. Default = 13
-zstyle ':omz:update' frequency 13
+#zstyle ':omz:update' frequency 13
 
 # Autocorrection
 ENABLE_CORRECTION="true"
@@ -51,7 +51,7 @@ plugins=(
 
 
 # Source oh-my-zsh
-source $ZSH/oh-my-zsh.sh
+#source $ZSH/oh-my-zsh.sh
 
 
 # Homebrew plugins
@@ -84,6 +84,11 @@ alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
 # -------------------- }}}
+
+
+#Starship init
+prompt off
+eval "$(starship init zsh)"
 
 # Vim modeline
 # vim:foldmethod=marker:foldlevel=0
