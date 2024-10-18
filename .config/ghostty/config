@@ -10,4 +10,6 @@ keybind = ctrl+d=new_split:right
 
 font-family = Lilex Nerd Font Mono
 
-theme = BlulocoDark 
+theme = BlulocoDark
+
+window-decoration = false
