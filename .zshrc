@@ -85,6 +85,9 @@ alias vim="nvim"
 # Alias to sync dotfiles
 alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
 
+# Alias for lazygit
+alias lg="lazygit"
+
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
 # -------------------- }}}
