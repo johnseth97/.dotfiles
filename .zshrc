@@ -15,11 +15,13 @@ export PATH=$PATH:~/.iterm2
 # source antidote
 source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
 
+# Dircolors
+export CLICOLOR=1
+export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+alias ll="ls -alG"
+
 # initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
 antidote load
-
-# Theme (see https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
-ZSH_THEME="spaceship"
 
 # Case sensitive completeion
 CASE_SENSITIVE="false"
