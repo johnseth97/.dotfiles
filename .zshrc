@@ -12,9 +12,11 @@ export PATH="/opt/homebrew/bin:$PATH"
 # iTerm2 Plugins
 export PATH=$PATH:~/.iterm2
 
-# git GPG support
-#GPG_TTY=$(tty)
-#export GPG_TTY
+# source antidote
+source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
+
+# initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
+antidote load
 
 # Theme (see https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 ZSH_THEME="spaceship"
