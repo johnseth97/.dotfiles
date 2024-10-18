@@ -1,0 +1,5 @@
+# Base plugins
+MichaelAquilina/zsh-you-should-use
+zsh-users/zsh-autosuggestions
+zdharma-continuum/fast-syntax-highlighting kind:defer
+
