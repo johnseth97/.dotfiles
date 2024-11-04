@@ -12,4 +12,22 @@ font-family = Lilex Nerd Font Mono
 
 theme = BlulocoDark
 
-window-decoration = false
+window-decoration = true
+
+# macos-titlebar-style = visible
+
+macos-titlebar-proxy-icon = visible
+
+macos-titlebar-visibility = hidden
+
+background-opacity = 0.75
+
+background-blur-radius = 20
+macos-titlebar-buttons = hidden
+
+macos-titlebar-transparency = native
+
+# title = " "
+
+
+window-save-state = always
