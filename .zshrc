@@ -1,7 +1,7 @@
 # SETTINGS ------------------------- {{{
 
 # Ghostty in the shell
-export PATH=$PATH:/Applications/Ghostty.app/Contents/MacOS/
+export PATH=$PATH:$GHOSTTY_BIN_DIR
 
 # Path to your Oh My Zsh installation.
 # export ZSH="$HOME/.oh-my-zsh"
@@ -87,6 +87,11 @@ alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
 
 # Alias for lazygit
 alias lg="lazygit"
+
+# Aliases for tmux sessions
+#
+# IT117
+alias tmuxSeshIT117="~/.config/tmux/enviroments/IT117.sh"
 
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
