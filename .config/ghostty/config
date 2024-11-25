@@ -3,6 +3,9 @@
 # Comments start with a `#` and are only valid on their own line.
 # Blank lines are ignored!
 
+# Enable shell integration features for sudo
+shell-integration-features = "sudo"
+
 keybind = ctrl+z=close_surface
 keybind = ctrl+d=new_split:right
 
@@ -15,17 +18,20 @@ theme = BlulocoDark
 window-decoration = true
 
 # macos-titlebar-style = visible
+#
+
+shell-integration-features = sudo
 
 macos-titlebar-proxy-icon = visible
 
-macos-titlebar-visibility = hidden
+# macos-titlebar-visibility = hidden
 
 background-opacity = 0.75
 
 background-blur-radius = 20
-macos-titlebar-buttons = hidden
+# macos-titlebar-buttons = hidden
 
-macos-titlebar-transparency = native
+# macos-titlebar-transparency = native
 
 # title = " "
 

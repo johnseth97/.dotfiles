@@ -14,7 +14,7 @@ yabai -m config window_placement second_child
 # Mouse settings
 #
 # mouse modifier: none, cmd, alt, ctrl, shift
-yabaiconfig mouse_modifier alt
+# yabaiconfig mouse_modifier alt
 
 # Mouse actions
 yabai -m config mouse_action1 move

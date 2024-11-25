@@ -1,26 +1,48 @@
-# SETTINGS ------------------------- {{{
+# ~/.zshrc
 
+# SETTINGS ------------------------- {{{ 
+###############
+### SOURCES ### 
+###############
 # Ghostty in the shell
+
+## Enable ghostty shell integration
+## Ghostty shell integration for Zsh. This must be at the top of your .zshrc!
+## Check if Ghostty is available
+
+if [[ -n "${GHOSTTY_RESOURCES_DIR}" ]]; then
+    autoload -Uz -- "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+    ghostty-integration
+    unfunction ghostty-integration
+fi
+
+# Preserve Ghostty Terminfo for sudo
+export GHOSTTY_SHELL_INTEGRATION_FEATURES="sudo"
+export TERMINFO="${GHOSTTY_RESOURCES_DIR}/../terminfo"
+
+# Ghostty bin directory
 export PATH=$PATH:$GHOSTTY_BIN_DIR
 
-# Path to your Oh My Zsh installation.
-# export ZSH="$HOME/.oh-my-zsh"
 
-# Path to homebrew
-export PATH="/opt/homebrew/bin:$PATH"
+# Path to homebrew export 
+PATH="/opt/homebrew/bin:$PATH" 
 
-# iTerm2 Plugins
-export PATH=$PATH:~/.iterm2
+# Source antidote 
+source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh 
 
-# source antidote
-source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
+# Source NVM
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
 
-# Dircolors
-export CLICOLOR=1
-export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
-alias ll="ls -alG"
+##############
+###  SETUP ### 
+############## 
 
-# initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
+# Dircolors 
+export CLICOLOR=1 
+export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd 
+alias ll="ls -alGh" 
+
+# Antidote load(plugins manager) initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
 antidote load
 
 # Case sensitive completeion
@@ -29,12 +51,6 @@ CASE_SENSITIVE="false"
 # Hypen insensitive case completeion
 HYPHEN_INSENSITIVE="true"
 
-# Auto update behavior (disabled | auto | reminder)
-#zstyle ':omz:update' mode reminder
-
-# Auto-update frequency in days. Default = 13
-#zstyle ':omz:update' frequency 13
-
 # Autocorrection
 ENABLE_CORRECTION="true"
 
@@ -42,7 +58,6 @@ ENABLE_CORRECTION="true"
 
 
 # PLUGINS ------------------------ {{{
-
 
 # Zsh builtin plugins
 plugins=( 
@@ -62,10 +77,13 @@ plugins=(
 # source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 # source $(brew --prefix)/share/zsh-you-should-use/you-should-use.plugin.zsh
-# ------------------------- }}}zo
+# ------------------------- }}}
 
 
 # ALIASES -------------------- {{{ 
+
+# Re-enable alias expansion
+# setopt aliases
 
 # Edit .zshrc
 alias zshedit="nvim ~/.zshrc"
@@ -88,6 +106,9 @@ alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
 # Alias for lazygit
 alias lg="lazygit"
 
+# Alias to copy over terminfo to remote machine
+alias ghostty-setup="infocmp -x | ssh remote-host -- tic -x -":
+
 # Aliases for tmux sessions
 #
 # IT117
@@ -97,10 +118,58 @@ alias tmuxSeshIT117="~/.config/tmux/enviroments/IT117.sh"
 #alias pinentry='pinentry-mac'
 # -------------------- }}}
 
-
 #Starship init
 prompt off
 eval "$(starship init zsh)"
 
+# BANNER ------------------------- {{{
+display_banner() {
+    # Colors
+    RED='%F{red}'
+    GREEN='%F{green}'
+    YELLOW='%F{yellow}'
+    BLUE='%F{blue}'
+    MAGENTA='%F{magenta}'
+    CYAN='%F{cyan}'
+    RESET='%F{reset}'
+
+    # Gather information
+    HOSTNAME=$(hostname)
+    IP=$(ipconfig getifaddr en0 2>/dev/null || echo "N/A")
+    TIME=$(date "+%H:%M:%S")
+    SYSTEM=$(uname -sm)
+    ALIASES=$(alias | wc -l | awk '{print $1}')
+    PLUGINS=${#plugins[@]:-0}
+
+
+    # Print banner
+    print -P "\n${CYAN}System:${GREEN} ${SYSTEM}${RESET}"
+    print -P "${CYAN}Hostname:${YELLOW} ${HOSTNAME}${RESET}"
+    print -P "${CYAN}IP Address:${BLUE} ${IP}${RESET}"
+    print -P "${CYAN}Terminfo:${MAGENTA} ${TERMINFO}${RESET}"
+    print -P "${CYAN}Loaded Plugins:${RED} ${PLUGINS}${RESET}"
+    print -P "${CYAN}Aliases:${RED} ${ALIASES}${RESET}"
+    print -P "${CYAN}Time:${YELLOW} ${TIME}${RESET}\n"
+}
+# ------------------------- }}}
+
+# Call the banner function
+display_banner
+
 # Vim modeline
 # vim:foldmethod=marker:foldlevel=0
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+        . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
