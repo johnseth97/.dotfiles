@@ -28,7 +28,7 @@ export PATH=$PATH:$GHOSTTY_BIN_DIR
 PATH="/opt/homebrew/bin:$PATH" 
 
 # Source antidote 
-source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh 
+source ~/.antidote/antidote.zsh 
 
 # Source NVM
 export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
