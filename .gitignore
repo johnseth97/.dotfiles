@@ -1,5 +1,6 @@
 
 //Ignoring unneeded files in .config
+.config/tmux/plugins/
 
 .config/nvim.bak/
 .config/btop/
