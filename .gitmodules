@@ -8,3 +8,6 @@
 	path = .config/sketchybar
 	url = https://github.com/crissNb/dotfiles.git
 	branch = main
+[submodule "/Users/ejohnson/.dotfiles/.config/sketchybar"]
+	path = /Users/ejohnson/.dotfiles/.config/sketchybar
+	url = https://github.com/crissNb/dotfiles
