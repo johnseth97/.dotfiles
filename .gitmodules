@@ -4,3 +4,7 @@
 [submodule ".config/tmux/plugins/tpm"]
 	path = .config/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule ".config/sketchybar"]
+	path = .config/sketchybar
+	url = https://github.com/crissNb/dotfiles.git
+	branch = main
