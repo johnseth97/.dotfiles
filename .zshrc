@@ -124,15 +124,16 @@ eval "$(starship init zsh)"
 
 # BANNER ------------------------- {{{
 display_banner() {
+    
     # Colors
-    RED='%F{red}'
-    GREEN='%F{green}'
-    YELLOW='%F{yellow}'
-    BLUE='%F{blue}'
-    MAGENTA='%F{magenta}'
-    CYAN='%F{cyan}'
-    RESET='%F{reset}'
-
+    RED=$'\033[31m'       # Red
+    GREEN=$'\033[32m'     # Green
+    YELLOW=$'\033[33m'    # Yellow
+    BLUE=$'\033[34m'      # Blue
+    MAGENTA=$'\033[35m'   # Magenta
+    CYAN=$'\033[36m'      # Cyan
+    RESET=$'\033[0m'      # Reset color
+    
     # Gather information
     HOSTNAME=$(hostname)
     IP=$(ipconfig getifaddr en0 2>/dev/null || echo "N/A")
