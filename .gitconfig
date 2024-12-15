@@ -13,6 +13,6 @@
 [commit]
 	gpgsign = true
 [gpg]
-	program = /run/current-system/sw/bin/gpg
+	program = /opt/homebrew/bin/gpg
 [init]
 	defaultBranch = main

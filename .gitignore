@@ -15,3 +15,5 @@
 .config/iterm2/sockets
 .config/iterm2/.DS_Store
 .config/wireshark/
+
+.config/fish/
