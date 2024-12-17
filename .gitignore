@@ -1,7 +1,7 @@
 
 //Ignoring unneeded files in .config
 
-test/**/*
+testing/**/*
 .gitconfig
 .config/tmux/plugins/
 .config/nvim.bak/
