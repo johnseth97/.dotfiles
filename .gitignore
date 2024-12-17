@@ -1,6 +1,6 @@
 
 //Ignoring unneeded files in .config
-
+*.bak
 testing/**/*
 .gitconfig
 .config/tmux/plugins/
