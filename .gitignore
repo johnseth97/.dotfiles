@@ -1,7 +1,9 @@
 
 //Ignoring unneeded files in .config
-.config/tmux/plugins/
 
+test/**/*
+.gitconfig
+.config/tmux/plugins/
 .config/nvim.bak/
 .config/btop/
 .config/fontforge/
