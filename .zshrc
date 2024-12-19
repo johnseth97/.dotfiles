@@ -203,6 +203,11 @@ display_banner
 # Disable the profiler for the rest of the session
 unset ZSH_PROFILE_STARTUP
 
+# Start tmux if not in a tmux session or SSH connection
+if [[ -z "$TMUX" && -z "$SSH_CONNECTION" ]]; then
+  tmux attach || tmux new
+fi
+
 # End ZSHRC 
 
 # Vim modeline
