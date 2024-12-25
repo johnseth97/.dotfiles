@@ -1,5 +1,56 @@
+# System and Editor Files
+.DS_Store
+*.bak
+*.old
+*~
+*.swp
+.vscode/
+.idea/
 
-//Ignoring unneeded files in .config
+# Logs
+*.log
+
+# Git Metadata
+.git/config
+.git/modules/
+!.gitignore
+
+# Package and Dependency Files
+node_modules/
+venv/
+.venv/
+package-lock.json
+yarn.lock
+
+# Build Artifacts
+*.o
+*.out
+*.class
+
+# User-Specific Config
+.env
+.history
+
+# Generated Assets
+themes/
+*.webp
+*.svg
+
+# Application-Specific
+bin/
+plugins/
+*.lock
+lazy-lock.json
+stylua.toml
+
+# Ignore specific tools
+tmux.conf
+*.plist
+btop.conf
+sketchybarrc
+skhdrc
+
+# Ignoring unneeded files in .config
 *.bak
 testing/**/*
 .gitconfig
@@ -13,9 +64,13 @@ testing/**/*
 .config/coc/
 .config/github-copilot/
 .config/gtk-2.0/
-.config/iterm2/AppSupport
-.config/iterm2/sockets
+.config/iterm2/AppSupport/
+.config/iterm2/sockets/
 .config/iterm2/.DS_Store
 .config/wireshark/
-
 .config/fish/
+
+# Specific Configurations
+.config/iterm2/
+.config/github-copilot/
+.config/wireshark/
