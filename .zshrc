@@ -88,6 +88,9 @@ alias lg="lazygit"
 # Alias to copy over terminfo to remote machine
 alias ghostty-setup="infocmp -x | ssh remote-host -- tic -x -":
 
+# Alias ls to la -lah
+alias ls="ls -lah"
+
 # Aliases for tmux sessions
 #
 # IT117
