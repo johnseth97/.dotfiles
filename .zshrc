@@ -89,7 +89,7 @@ alias lg="lazygit"
 alias ghostty-setup="infocmp -x | ssh remote-host -- tic -x -":
 
 # Alias ls to la -lah
-alias ls="ls -lah"
+alias la="ls -lah"
 
 # Aliases for tmux sessions
 #
