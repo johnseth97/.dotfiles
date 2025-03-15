@@ -96,6 +96,7 @@ brew "jpeg-turbo", desc: "High-speed JPEG encoder/decoder"
 brew "libvpx", desc: "VP8/VP9 video codec"
 brew "opus", desc: "Interactive speech and music codec"
 brew "tesseract", desc: "OCR engine for text recognition"
+brew "qrencode", desc: "QR code generator"
 
 #######################
 # Mac App Store CLI
