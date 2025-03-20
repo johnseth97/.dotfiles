@@ -28,6 +28,9 @@ export PATH=$PATH:$GHOSTTY_BIN_DIR
 # Path to homebrew export 
 export PATH="/opt/homebrew/bin:$PATH" 
 
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/ejohnson/.lmstudio/bin"
+
 # Source antidote 
 source ~/.antidote/antidote.zsh 
 
@@ -84,6 +87,9 @@ alias lg="lazygit"
 
 # Alias to copy over terminfo to remote machine
 alias ghostty-setup="infocmp -x | ssh remote-host -- tic -x -":
+
+# Alias ls to la -lah
+alias la="ls -lah"
 
 # Aliases for tmux sessions
 #

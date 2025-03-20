@@ -1,0 +1,15 @@
+{
+	"latest_signin": "dynamic_renewables",
+	"device": "cfu27lylqlfif6yswaep5kvxwm",
+	"accounts": [
+		{
+			"shorthand": "dynamic_renewables",
+			"accountUUID": "EIEWJUCOABDJ5LHHSHL4TRG6EI",
+			"url": "https://dynamic-renewables.1password.com",
+			"email": "ethan.johnson@dynamic-renewables.com",
+			"accountKey": "A3-HJB7SM-9Q5P85-KR4Q4-4HY3X-H6PTX-9DR67",
+			"userUUID": "EH46F3QI55CRLNXPTFUPUGEAVU",
+			"dsecret": "r-Aze_J6WsjkAOlk8AKThQ"
+		}
+	]
+}

@@ -1,0 +1,5 @@
+[[database]]
+Name = 'Testing SqLite'
+Provider = 'sqlite3'
+DBName = ''
+URL = 'testing.db'
