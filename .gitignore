@@ -69,6 +69,7 @@ testing/**/*
 .config/iterm2/.DS_Store
 .config/wireshark/
 .config/fish/
+.config/1Password/
 
 # Specific Configurations
 .config/iterm2/
