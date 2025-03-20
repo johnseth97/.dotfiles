@@ -25,6 +25,15 @@ export TERMINFO="${GHOSTTY_RESOURCES_DIR}/../terminfo/"
 # Ghostty bin directory
 export PATH=$PATH:$GHOSTTY_BIN_DIR
 
+# Set pager and editor to neovim
+export EDITOR=nvim
+export VISUAL=nvim
+
+# Set 1password ssh agent, if it exists
+if [ -S "$HOME/.1password/agent.sock" ]; then
+  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+fi
+
 # Path to homebrew export 
 export PATH="/opt/homebrew/bin:$PATH" 
 
