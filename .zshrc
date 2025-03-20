@@ -25,17 +25,35 @@ export TERMINFO="${GHOSTTY_RESOURCES_DIR}/../terminfo/"
 # Ghostty bin directory
 export PATH=$PATH:$GHOSTTY_BIN_DIR
 
+#######################
+### MacOS Specifics ###
+#######################
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # --- macOS (Darwin) Settings ---
+  # Set the 1Password SSH agent socket for macOS
+  if [ -S "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  fi
+  
+  # Homebrew is only on macOS; add its bin directory to PATH
+  export PATH="/opt/homebrew/bin:$PATH"
+  
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # --- Linux (Fedora/Debian) Settings ---
+  # If the 1Password SSH agent socket exists, set it
+  if [ -S "$HOME/.1password/agent.sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+  fi
+  
+else
+  # Other OS configurations (if needed)
+  echo "Unknown OSTYPE: $OSTYPE"
+fi
+
 # Set pager and editor to neovim
 export EDITOR=nvim
 export VISUAL=nvim
-
-# Set 1password ssh agent, if it exists
-if [ -S "$HOME/.1password/agent.sock" ]; then
-  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
-fi
-
-# Path to homebrew export 
-export PATH="/opt/homebrew/bin:$PATH" 
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/ejohnson/.lmstudio/bin"
@@ -51,6 +69,7 @@ antidote load
 ##############
 ###  SETUP ### 
 ############## 
+
 # Preferences ------------------------- {{{
 
 # Dircolors 
@@ -85,12 +104,6 @@ alias zshedit="nvim ~/.zshrc"
 
 # Edit Neovim init.lua
 alias vimedit="vim ~/.config/nvim/init.lua"
-
-# Edit nix flake
-alias nixedit="vim ~/nix/flake.nix"
-
-# Rebuild Nix darwin
-alias nixrebuild="darwin-rebuild switch --flake ~/nix#MacbookPro"
 
 # Alias Vim to Neovim
 alias vim="nvim"
