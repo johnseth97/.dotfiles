@@ -68,6 +68,13 @@ HYPHEN_INSENSITIVE="true"
 ENABLE_CORRECTION="true"
 # ------------------------- }}}
 
+# SCRIPTS -------------------- {{{
+
+# lse explains everything about a file, as in ls explain
+source ~/.dotfiles/.scripts/lse.sh
+
+# }}}
+
 # ALIASES -------------------- {{{ 
 
 # Re-enable alias expansion
@@ -107,6 +114,7 @@ alias tmuxSeshIT117="~/.config/tmux/enviroments/IT117.sh"
 
 # Point pinentry to pinentry-mac
 #alias pinentry='pinentry-mac'
+
 # -------------------- }}}
 
 # Init functions ------------------------- {{{
@@ -211,6 +219,12 @@ display_banner() {
 }
 
 # ------------------------- }}}
+
+
+############
+### INIT ###
+############
+
 
 # Call the banner function
 display_banner
