@@ -60,6 +60,8 @@ brew "wireshark", desc: "Network traffic analyzer"
 brew "openssl@3", desc: "TLS/SSL cryptography library"
 brew "pinentry-touchid", desc: "GPG Pinentry with TouchID"
 brew "pam-reattach", desc: "Persist sudo TouchID across sessions"
+brew "1password", desc: "1Password"
+brew "1password-cli", desc: "1Password CLI"
 
 #######################
 # Networking & APIs

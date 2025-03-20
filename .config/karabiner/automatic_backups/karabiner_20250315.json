@@ -5,6 +5,7 @@
                 "rules": [
                     {
                         "description": "Use Cmd + JKL; as Arrow Keys",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -42,21 +43,6 @@
                     }
                 ]
             },
-            "devices": [
-                {
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "product_id": 834,
-                        "vendor_id": 1452
-                    },
-                    "simple_modifications": [
-                        {
-                            "from": { "key_code": "caps_lock" },
-                            "to": [{ "key_code": "left_control" }]
-                        }
-                    ]
-                }
-            ],
             "name": "Default profile",
             "selected": true,
             "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
