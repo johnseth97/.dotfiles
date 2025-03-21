@@ -17,85 +17,27 @@ fi
 # Check if Ghostty is available
 if [[ -n "${GHOSTTY_RESOURCES_DIR}" ]]; then
     autoload -Uz -- "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+    
+    # Preserve Ghostty Terminfo for sudo
+    export GHOSTTY_SHELL_INTEGRATION_FEATURES="sudo"
+    export TERMINFO="${GHOSTTY_RESOURCES_DIR}/../terminfo/"
+
+    # Ghostty bin directory
+    export PATH=$PATH:$GHOSTTY_BIN_DIR
+
 fi
 
-# Preserve Ghostty Terminfo for sudo
-export GHOSTTY_SHELL_INTEGRATION_FEATURES="sudo"
-export TERMINFO="${GHOSTTY_RESOURCES_DIR}/../terminfo/"
-
-# Ghostty bin directory
-export PATH=$PATH:$GHOSTTY_BIN_DIR
-
-#######################
-### MacOS Specifics ###
-#######################
+# Load OS-specific configuration
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  # --- macOS (Darwin) Settings ---
-  # Set the 1Password SSH agent socket for macOS
-  if [ -S "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]; then
-    export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-  fi
-  
-  # Homebrew is only on macOS; add its bin directory to PATH
-  export PATH="/opt/homebrew/bin:$PATH"
-  
-  # 1pw git setup (Only if 1Password CLI is installed)
-  if command -v op &>/dev/null; then
-    export GIT_SSH_COMMAND="ssh"
-    export GPG_TTY=$(tty)
-    git config --global gpg.format ssh
-    git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-  else
-    echo "[1Password] Skipping Git integration - 1Password CLI not found."
-  fi 
-
-#########################
-### Windows Specifics ###
-#########################
-
+  source "$HOME/.config/zsh/macos.zsh"
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-  
-  # Alias ssh to ssh.exe, for 1pw
-  alias ssh='ssh.exe'
-  alias ssh-add='ssh-add.exe'
-  
-  # WSL User home directory
-  export WINHOME=$(wslpath "$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null)")
- 
-  # 1pw git setup (Only if 1Password exists)
-  if [ -f "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl" ]; then
-    export GIT_SSH_COMMAND="ssh.exe"
-    git config --global gpg.format ssh
-    git config --global gpg.ssh.program "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
-  else
-    echo "[1Password] Skipping Git integration - op-ssh-sign-wsl not found."
-  fi
-
-#######################
-### Linux Specifics ###
-#######################
+  source "$HOME/.config/zsh/wsl.zsh"
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  # --- Linux (Fedora/Debian) Settings ---
-  # If the 1Password SSH agent socket exists, set it
-  if [ -S "$HOME/.1password/agent.sock" ]; then
-    export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
-  fi
- 
-  # 1pw git setup (Only if 1Password CLI is installed)
-  if command -v op &>/dev/null && [ -f "/usr/local/bin/op-ssh-sign" ]; then
-    export GIT_SSH_COMMAND="ssh"
-    git config --global gpg.format ssh
-    git config --global gpg.ssh.program "/usr/local/bin/op-ssh-sign"
-  else
-    echo "[1Password] Skipping Git integration - 1Password CLI or op-ssh-sign missing."
-  fi
-
+  source "$HOME/.config/zsh/linux.zsh"
 else
-  # Other OS configurations (if needed)
-  echo "zshrc 1pw SSH setup | Unsupported OSTYPE(support it yourself!): $OSTYPE"
+  echo "❌ Unsupported OSTYPE ($OSTYPE) – No matching zsh config in ~/.config/zsh/. Make it yourself!"
 fi
-
 
 # Set pager and editor to neovim
 export EDITOR=nvim
