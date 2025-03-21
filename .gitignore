@@ -76,3 +76,4 @@ testing/**/*
 .config/github-copilot/
 .config/wireshark/
 .config/go/telemetry/local
+.config/op/config

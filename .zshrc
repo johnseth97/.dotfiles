@@ -10,6 +10,7 @@ fi
 ### SOURCES ### 
 ###############
 
+
 # Shell integrations ------------------------- {{{
 
 # Ghostty in the shell
@@ -38,18 +39,60 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   
   # Homebrew is only on macOS; add its bin directory to PATH
   export PATH="/opt/homebrew/bin:$PATH"
+
+  # Set up git to use ssh
+  export GIT_SSH_COMMAND="ssh"
+  export GPG_TTY=$(tty)
+  git config --global gpg.format ssh
+  git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" 
+
+#########################
+### Windows Specifics ###
+#########################
+
+elif [[ -n "$WSL_DISTRO_NAME" ]]; then
   
+  # Alias ssh to ssh.exe, for 1pw
+  alias ssh='ssh.exe'
+  alias ssh-add='ssh-add.exe'
+  
+  # WSL User home directory
+  export WINHOME=$(wslpath "$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null)")
+
+  # Git Setup
+  export GIT_SSH_COMMAND="ssh.exe"
+  git config --global gpg.format ssh
+  git config --global gpg.ssh.program "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+
+   # Sync ~/.dotfiles/.ssh/config to Windows SSH config
+  DOTFILES_SSH_CONFIG="$HOME/.dotfiles/.ssh/config"
+  WINDOWS_SSH_CONFIG="$WINHOME/.ssh/config"
+
+  if [ -f "$DOTFILES_SSH_CONFIG" ]; then
+    echo "[1Password] Syncing SSH config to Windows..."
+    mkdir -p "$(dirname "$WINDOWS_SSH_CONFIG")"
+    cp "$DOTFILES_SSH_CONFIG" "$WINDOWS_SSH_CONFIG"
+  fi
+
+#######################
+### Linux Specifics ###
+#######################
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # --- Linux (Fedora/Debian) Settings ---
   # If the 1Password SSH agent socket exists, set it
   if [ -S "$HOME/.1password/agent.sock" ]; then
     export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
   fi
-  
+
+  export GIT_SSH_COMMAND="ssh"
+  git config --global gpg.format ssh
+  git config --global gpg.ssh.program "/usr/local/bin/op-ssh-sign"
+
 else
   # Other OS configurations (if needed)
-  echo "Unknown OSTYPE: $OSTYPE"
+  echo "zshrc 1pw SSH setup | Unsupported OSTYPE(support it yourself!): $OSTYPE"
 fi
+
 
 # Set pager and editor to neovim
 export EDITOR=nvim
