@@ -75,3 +75,4 @@ testing/**/*
 .config/iterm2/
 .config/github-copilot/
 .config/wireshark/
+.config/go/telemetry/local
