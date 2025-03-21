@@ -39,12 +39,16 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   
   # Homebrew is only on macOS; add its bin directory to PATH
   export PATH="/opt/homebrew/bin:$PATH"
-
-  # Set up git to use ssh
-  export GIT_SSH_COMMAND="ssh"
-  export GPG_TTY=$(tty)
-  git config --global gpg.format ssh
-  git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign" 
+  
+  # 1pw git setup (Only if 1Password CLI is installed)
+  if command -v op &>/dev/null; then
+    export GIT_SSH_COMMAND="ssh"
+    export GPG_TTY=$(tty)
+    git config --global gpg.format ssh
+    git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  else
+    echo "[1Password] Skipping Git integration - 1Password CLI not found."
+  fi 
 
 #########################
 ### Windows Specifics ###
@@ -58,20 +62,14 @@ elif [[ -n "$WSL_DISTRO_NAME" ]]; then
   
   # WSL User home directory
   export WINHOME=$(wslpath "$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null)")
-
-  # Git Setup
-  export GIT_SSH_COMMAND="ssh.exe"
-  git config --global gpg.format ssh
-  git config --global gpg.ssh.program "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
-
-   # Sync ~/.dotfiles/.ssh/config to Windows SSH config
-  DOTFILES_SSH_CONFIG="$HOME/.dotfiles/.ssh/config"
-  WINDOWS_SSH_CONFIG="$WINHOME/.ssh/config"
-
-  if [ -f "$DOTFILES_SSH_CONFIG" ]; then
-    echo "[1Password] Syncing SSH config to Windows..."
-    mkdir -p "$(dirname "$WINDOWS_SSH_CONFIG")"
-    cp "$DOTFILES_SSH_CONFIG" "$WINDOWS_SSH_CONFIG"
+ 
+  # 1pw git setup (Only if 1Password exists)
+  if [ -f "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl" ]; then
+    export GIT_SSH_COMMAND="ssh.exe"
+    git config --global gpg.format ssh
+    git config --global gpg.ssh.program "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+  else
+    echo "[1Password] Skipping Git integration - op-ssh-sign-wsl not found."
   fi
 
 #######################
@@ -83,10 +81,15 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   if [ -S "$HOME/.1password/agent.sock" ]; then
     export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
   fi
-
-  export GIT_SSH_COMMAND="ssh"
-  git config --global gpg.format ssh
-  git config --global gpg.ssh.program "/usr/local/bin/op-ssh-sign"
+ 
+  # 1pw git setup (Only if 1Password CLI is installed)
+  if command -v op &>/dev/null && [ -f "/usr/local/bin/op-ssh-sign" ]; then
+    export GIT_SSH_COMMAND="ssh"
+    git config --global gpg.format ssh
+    git config --global gpg.ssh.program "/usr/local/bin/op-ssh-sign"
+  else
+    echo "[1Password] Skipping Git integration - 1Password CLI or op-ssh-sign missing."
+  fi
 
 else
   # Other OS configurations (if needed)
