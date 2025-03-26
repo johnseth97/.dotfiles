@@ -8,7 +8,12 @@ alias ssh='ssh.exe'
 alias ssh-add='ssh-add.exe'
 
 # Detect Windows user home directory
-export WINHOME=$(wslpath "$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null)")
+windows_userprofile=$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null | tr -d '\r')
+if [[ -n "$windows_userprofile" ]]; then
+  export WINHOME=$(wslpath "$windows_userprofile")
+else
+  echo "⚠️ Could not detect Windows user profile. Is WSL interop enabled?"
+fi
 
 # 1Password Git setup (if available)
 if [ -f "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl" ]; then

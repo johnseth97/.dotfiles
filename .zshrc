@@ -31,7 +31,7 @@ fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   source "$HOME/.config/zsh/macos.zsh"
-elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+elif grep -qi microsoft /proc/version; then
   source "$HOME/.config/zsh/wsl.zsh"
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   source "$HOME/.config/zsh/linux.zsh"
