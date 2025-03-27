@@ -118,6 +118,7 @@ cask "metasploit", desc: "Penetration testing framework"
 cask "sf-symbols", desc: "Apple SF Symbols tool"
 cask "yaak", desc: "macOS clipboard manager"
 cask "ghostty", desc: "Minimalist terminal app"
+cask "gimp", desc: "GNU Image Manipulation Program"
 
 #######################
 # Mac App Store Applications

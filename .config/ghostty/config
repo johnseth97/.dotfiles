@@ -9,18 +9,15 @@ shell-integration-features = "sudo"
 keybind = ctrl+z=close_surface
 keybind = ctrl+d=new_split:right
 
-# Empty values reset the configuration to the default value
-
+# Appearance
 font-family = Lilex Nerd Font Mono
 
 theme = catppuccin-macchiato
 
-
+# Macos specific settings
 window-decoration = true
 
 macos-titlebar-style = hidden
-
-shell-integration-features = sudo
 
 macos-titlebar-proxy-icon = visible
 
