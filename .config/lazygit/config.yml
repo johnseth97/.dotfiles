@@ -2,3 +2,10 @@ git:
   paging:
     colorArg: always
     pager: delta --dark --paging=never
+
+keybinding:
+  universal:
+    nextItem-alt: 'k'     # ⬇️ down
+    prevItem-alt: 'l'     # ⬆️ up
+    prevBlock-alt: 'j'    # ⬅️ move panel left
+    nextBlock-alt: ';'    # ➡️ move panel right
