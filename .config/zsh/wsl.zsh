@@ -11,6 +11,7 @@ alias ssh-add='ssh-add.exe'
 windows_userprofile=$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null | tr -d '\r')
 if [[ -n "$windows_userprofile" ]]; then
   export WINHOME=$(wslpath "$windows_userprofile")
+  export IS_WSL=1
 else
   echo "⚠️ Could not detect Windows user profile. Is WSL interop enabled?"
 fi

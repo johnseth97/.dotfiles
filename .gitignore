@@ -47,7 +47,6 @@ stylua.toml
 # Ignore specific tools
 tmux.conf
 *.plist
-btop.conf
 sketchybarrc
 skhdrc
 
@@ -56,7 +55,6 @@ skhdrc
 testing/**/*
 .config/tmux/plugins/
 .config/nvim.bak/
-.config/btop/
 .config/fontforge/
 .config/.DS_Store
 .config/Autodesk/
