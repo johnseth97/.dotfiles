@@ -53,6 +53,10 @@
                         {
                             "from": { "key_code": "caps_lock" },
                             "to": [{ "key_code": "left_control" }]
+                        },
+                        {
+                            "from": { "key_code": "right_command" },
+                            "to": [{ "key_code": "right_option" }]
                         }
                     ]
                 }
