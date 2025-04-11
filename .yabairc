@@ -17,5 +17,5 @@ yabai -m config left_padding   20
 yabai -m config right_padding  20
 yabai -m config window_gap     20
 
-# Sketchybar pad
-yabai -m config external_bar all:20:20
+yabai -m config external_bar all:0:0
+
