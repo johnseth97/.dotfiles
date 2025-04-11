@@ -45,10 +45,8 @@ lazy-lock.json
 stylua.toml
 
 # Ignore specific tools
-tmux.conf
 *.plist
 sketchybarrc
-skhdrc
 
 # Ignoring unneeded files in .config
 *.bak
@@ -75,3 +73,4 @@ testing/**/*
 .config/wireshark/
 .config/go/telemetry/local
 .config/op/config
+.config/karabiner/automatic_backups
