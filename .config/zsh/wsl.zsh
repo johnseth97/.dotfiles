@@ -16,6 +16,8 @@ else
   echo "⚠️ Could not detect Windows user profile. Is WSL interop enabled?"
 fi
 
+export PATH=$PATH:/opt/mssql-tools18/bin
+
 # 1Password Git setup (if available)
 if [ -f "$WINHOME/AppData/Local/1Password/app/8/op-ssh-sign-wsl" ]; then
   export GIT_SSH_COMMAND="ssh.exe"
