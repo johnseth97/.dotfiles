@@ -46,6 +46,9 @@ export VISUAL=nvim
 # Source antidote 
 source ~/.antidote/antidote.zsh 
 
+# Source secrets
+source ~/.secrets/.env
+
 # Antidote load(plugins manager) initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
 antidote load
 
@@ -95,6 +98,9 @@ alias vim="nvim"
 
 # Alias to sync dotfiles
 alias sync-dotfiles="~/.dotfiles/.bin/sync-dotfiles"
+
+# Alias to sync secrets
+alias sync-secrets="~/.dotfiles/.bin/op-sync-secrets.sh"
 
 # Alias for lazygit
 alias lg="lazygit"
