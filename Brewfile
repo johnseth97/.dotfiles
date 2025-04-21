@@ -46,6 +46,7 @@ brew "llvm", desc: "Next-gen compiler infrastructure"
 brew "sqlite", desc: "SQL database engine"
 brew "mariadb-connector-c", desc: "MariaDB client library"
 brew "unixodbc", desc: "ODBC database connector"
+brew "orbstack", desc: "Lightweight container management"
 
 #######################
 # Security & Infosec Tools
