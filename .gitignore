@@ -74,3 +74,6 @@ testing/**/*
 .config/go/telemetry/local
 .config/op/config
 .config/karabiner/automatic_backups
+.config/gh/hosts.yml
+.config/gh/config.yml
+.config/nextjs-nodejs/config.json
