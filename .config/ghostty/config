@@ -4,9 +4,6 @@
 # Enable shell integration features for sudo
 shell-integration-features = "sudo"
 
-keybind = ctrl+z=close_surface
-keybind = ctrl+d=new_split:right
-
 # Appearance
 font-family = Lilex Nerd Font Mono
 
