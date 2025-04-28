@@ -100,6 +100,10 @@ brew "libvpx", desc: "VP8/VP9 video codec"
 brew "opus", desc: "Interactive speech and music codec"
 brew "tesseract", desc: "OCR engine for text recognition"
 brew "qrencode", desc: "QR code generator"
+brew "Chafa", desc: "Images in terminal"
+brew "ImageMagick", desc: "SVGs in terminal" 
+brew "ffmpegthumbnailer", desc: "video thumbnails in terminal"
+
 
 #######################
 # Mac App Store CLI
