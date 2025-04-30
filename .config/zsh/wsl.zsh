@@ -3,9 +3,16 @@
 
 echo "🔹 Loading WSL config..."
 
+# Source /etc/profile for windows path on non-login shells
+source /etc/profile
+
 # Alias Windows SSH utilities
 alias ssh='ssh.exe'
 alias ssh-add='ssh-add.exe'
+
+# Set truecolors for windows terminal
+export TERM="xterm-256color"
+export COLORTERM="truecolor"
 
 # Detect Windows user home directory
 windows_userprofile=$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null | tr -d '\r')

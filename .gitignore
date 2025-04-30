@@ -77,3 +77,4 @@ testing/**/*
 .config/gh/hosts.yml
 .config/gh/config.yml
 .config/nextjs-nodejs/config.json
+.config/uv/uv-receipt.json
