@@ -1,0 +1,13 @@
+---
+theme: catppuccin-macchiato-sapphire
+animation: "basic"
+env:
+  - .posting.env
+layout: vertical
+watch_env_files: true
+response:
+  prettify_json: true
+heading:
+  visible: true
+  show_host: true 
+...
