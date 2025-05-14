@@ -77,8 +77,8 @@ ENABLE_CORRECTION="true"
 
 # SCRIPTS -------------------- {{{
 
-# lse explains everything about a file, as in ls explain
-source ~/.dotfiles/.scripts/lse.sh
+export SCRIPTS="$HOME/.scripts"
+export PATH="$SCRIPTS:$PATH"
 
 # }}}
 

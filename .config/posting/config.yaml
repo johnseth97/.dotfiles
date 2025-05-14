@@ -2,7 +2,8 @@
 theme: catppuccin-macchiato-sapphire
 animation: "basic"
 env:
-  - .posting.env
+  - ./.posting.env
+pager: nvim
 layout: vertical
 watch_env_files: true
 response:
@@ -10,4 +11,5 @@ response:
 heading:
   visible: true
   show_host: true
+pager_json: fx
 ...

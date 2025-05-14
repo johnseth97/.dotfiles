@@ -1,5 +1,28 @@
+[application]
+DefaultPageSize = 300
+DisableSidebar = false
+SidebarOverlay = false
+
 [[database]]
 Name = 'Testing SqLite'
-Provider = 'sqlite3'
-DBName = ''
 URL = 'testing.db'
+Provider = 'sqlite3'
+Username = ''
+Password = ''
+Hostname = ''
+Port = ''
+DBName = ''
+URLParams = ''
+Commands = []
+
+[[database]]
+Name = 'BCO'
+URL = 'sqlserver://ejohnson:WN!qwvvcNW2v.BhxwmkEwgo_hs_v-FkU9Hb-wc.m84Evqh*J!Q_eyuYhmuzHo2*Y*VtJNJoRV8TA3Mj*EXHEmWceUn!JunkDU9PG@10.20.130.10:1433/BCO'
+Provider = 'sqlserver'
+Username = ''
+Password = ''
+Hostname = ''
+Port = ''
+DBName = 'BCO'
+URLParams = ''
+Commands = []
