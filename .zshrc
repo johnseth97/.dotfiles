@@ -155,3 +155,13 @@ fi
 
 # Vim modeline
 # vim:foldmethod=marker:foldlevel=0
+
+. "$HOME/.local/bin/env"
+
+# pnpm
+export PNPM_HOME="/Users/ejohnson/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
