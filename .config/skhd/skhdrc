@@ -22,3 +22,5 @@ shift + alt - 5 : yabai -m window --space 5 && yabai -m space --focus 5
 shift + alt - 6 : yabai -m window --space 6 && yabai -m space --focus 6
 shift + alt - 7 : yabai -m window --space 7 && yabai -m space --focus 7
 
+# Open default layout
+shift + alt - r : ~/.config/yabai/layout_reset.sh
