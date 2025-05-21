@@ -78,3 +78,5 @@ testing/**/*
 .config/gh/config.yml
 .config/nextjs-nodejs/config.json
 .config/uv/uv-receipt.json
+.config/lnav
+.config/btop/btop.log.1
