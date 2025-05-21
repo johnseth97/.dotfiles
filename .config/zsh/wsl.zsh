@@ -13,6 +13,7 @@ source /etc/bash_completion.d/azure-cli
 # Alias Windows SSH utilities
 alias ssh='ssh.exe'
 alias ssh-add='ssh-add.exe'
+alias clip='clip.exe'
 
 # Set truecolors for windows terminal
 export TERM="xterm-256color"

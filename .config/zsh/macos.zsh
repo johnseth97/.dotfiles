@@ -3,6 +3,10 @@
 
 echo "🔹 Loading macOS config..."
 
+
+# Alias macos specific commands
+alias clip="pbcopy"
+
 # This is unset by default on macOS, but we want to set it for consistency across systems
 export XDG_CONFIG_HOME="$HOME/.config"
 
