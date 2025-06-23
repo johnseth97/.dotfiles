@@ -39,9 +39,16 @@ else
   echo "❌ Unsupported OSTYPE ($OSTYPE) – No matching zsh config in ~/.config/zsh/. Make it yourself!"
 fi
 
+# Export local bin
+export PATH="$HOME/.local/bin:$PATH"
+
+
 # Set pager and editor to neovim
 export EDITOR=nvim
 export VISUAL=nvim
+# Set the default pager to neovim
+export PAGER="nvim +Man!"
+export MANPAGER='nvim +Man!'
 
 # Source antidote 
 source ~/.antidote/antidote.zsh 
