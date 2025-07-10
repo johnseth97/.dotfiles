@@ -39,6 +39,10 @@ else
   echo "❌ Unsupported OSTYPE ($OSTYPE) – No matching zsh config in ~/.config/zsh/. Make it yourself!"
 fi
 
+
+# Enable bash-style completions in Zsh
+autoload -U +X bashcompinit && bashcompinit
+
 # Export local bin
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -54,7 +58,7 @@ export MANPAGER='nvim +Man!'
 source ~/.antidote/antidote.zsh 
 
 # Source secrets
-source ~/.secrets/.env
+# source ~/.secrets/.env
 
 # Antidote load(plugins manager) initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
 antidote load

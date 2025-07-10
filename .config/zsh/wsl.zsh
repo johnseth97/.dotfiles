@@ -6,10 +6,6 @@ echo "🔹 Loading WSL config..."
 # Source /etc/profile for windows path on non-login shells
 source /etc/profile
 
-# Source bash completion for WSL
-autoload -U +X bashcompinit && bashcompinit
-source /etc/bash_completion.d/azure-cli
-
 # Alias Windows SSH utilities
 alias ssh='ssh.exe'
 alias ssh-add='ssh-add.exe'
