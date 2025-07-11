@@ -1,42 +1,32 @@
-#for this to work you must configure sudo such that
-# it will be able to run the command without password
+#!/bin/bash
 
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-sudo yabai --load-sa
-
-# Default Layout as Binary Space Partitioning
+# Binary Space Partitioning layout
 yabai -m config layout bsp
-
-# New window spawns to the right if vertical split, or bottom if horizontal split
 yabai -m config window_placement second_child
 
-
-# Mouse settings
-#
-# mouse modifier: none, cmd, alt, ctrl, shift
-# yabaiconfig mouse_modifier alt
-
-# Mouse actions
+# Mouse config
+yabai -m config mouse_modifier fn
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
-
-# Swap windows with mouse
-yabai -m  mouse_drop_action swap
-
-# Mouse follows focus
 yabai -m config mouse_follows_focus on
+yabai -m config mouse_drop_action swap
 
-
-# Visual settings
-#
-# Padding
-yabai -m config top_padding    12
+# Padding and gaps (12px like your old config)
+yabai -m config top_padding 12
 yabai -m config bottom_padding 12
-yabai -m config left_padding   12
-yabai -m config right_padding  12
-yabai -m config window_gap     12
+yabai -m config left_padding 12
+yabai -m config right_padding 12
+yabai -m config window_gap 12
 
-# Exclusions
-#
+# Window rules (still work without SA)
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
+
+# Border styles (optional)
+yabai -m config window_border on
+yabai -m config window_border_width 2
+yabai -m config active_window_border_color 0xffa6e3a1
+yabai -m config normal_window_border_color 0xff585b70
+
+# Restart skhd if Dock restarts
+yabai -m signal --add event=dock_did_restart action="launchctl kickstart -k gui/$(id -u)/homebrew.mxcl.skhd"
