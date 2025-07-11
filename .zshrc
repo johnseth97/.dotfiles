@@ -122,6 +122,9 @@ alias ghostty-setup="infocmp -x | ssh remote-host -- tic -x -":
 # Alias ls to la -lah
 alias la="ls -lah"
 
+# Alias jquaste to format JSON from clipboard
+alias jquaste="pbpaste | nvim -c ':%!jq .' -c 'set filetype=json' -"
+
 # Aliases for tmux sessions
 
 # IT117
