@@ -80,3 +80,4 @@ testing/**/*
 .config/uv/uv-receipt.json
 .config/lnav
 .config/btop/btop.log.1
+.config/swiftpm
