@@ -22,11 +22,11 @@ yabai -m config window_gap 12
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
 
-# Border styles (optional)
-yabai -m config window_border on
-yabai -m config window_border_width 2
-yabai -m config active_window_border_color 0xffa6e3a1
-yabai -m config normal_window_border_color 0xff585b70
+# Border styles (optional) Requires SIP To be disabled
+# yabai -m config window_border on
+# yabai -m config window_border_width 2
+# yabai -m config active_window_border_color 0xffa6e3a1
+# yabai -m config normal_window_border_color 0xff585b70
 
 # Restart skhd if Dock restarts
 yabai -m signal --add event=dock_did_restart action="launchctl kickstart -k gui/$(id -u)/homebrew.mxcl.skhd"
