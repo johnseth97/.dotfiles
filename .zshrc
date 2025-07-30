@@ -177,3 +177,8 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# Zephyr
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_SDK_INSTALL_DIR="$HOME/zephyr-sdk"
+export PATH="$HOME/zephyr-sdk/arm-zephyr-eabi/bin:$PATH"

@@ -5,8 +5,7 @@
 shell-integration-features = "sudo"
 
 # Appearance
-font-family = Lilex Nerd Font Mono
-
+font-family = BerkeleyMono Nerd Font Mono
 theme = catppuccin-macchiato
 
 # Macos specific settings
