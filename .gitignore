@@ -52,6 +52,8 @@ sketchybarrc
 *.bak
 testing/**/*
 .config/nvim.bak/
+.config/tmux/plugins/
+!.config/tmux/plugins/tpm
 .config/fontforge/
 .config/.DS_Store
 .config/Autodesk/
