@@ -6,7 +6,7 @@ shell-integration-features = "sudo"
 
 # Appearance
 font-family = BerkeleyMono Nerd Font Mono
-theme = catppuccin-macchiato
+theme = tokyonight-storm
 
 # Macos specific settings
 window-decoration = true
