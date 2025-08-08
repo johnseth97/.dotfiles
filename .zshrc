@@ -13,6 +13,18 @@ fi
 
 # Shell integrations ------------------------- {{{
 
+# Load OS-specific configuration
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source "$HOME/.config/zsh/macos.zsh"
+elif grep -qi microsoft /proc/version; then
+  source "$HOME/.config/zsh/wsl.zsh"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  source "$HOME/.config/zsh/linux.zsh"
+else
+  echo "❌ Unsupported OSTYPE ($OSTYPE) – No matching zsh config in ~/.config/zsh/. Make it yourself!"
+fi
+
 # Ghostty in the shell
 # Check if Ghostty is available
 if [[ -n "${GHOSTTY_RESOURCES_DIR}" ]]; then
@@ -25,18 +37,6 @@ if [[ -n "${GHOSTTY_RESOURCES_DIR}" ]]; then
     # Ghostty bin directory
     export PATH=$PATH:$GHOSTTY_BIN_DIR
 
-fi
-
-# Load OS-specific configuration
-
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  source "$HOME/.config/zsh/macos.zsh"
-elif grep -qi microsoft /proc/version; then
-  source "$HOME/.config/zsh/wsl.zsh"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  source "$HOME/.config/zsh/linux.zsh"
-else
-  echo "❌ Unsupported OSTYPE ($OSTYPE) – No matching zsh config in ~/.config/zsh/. Make it yourself!"
 fi
 
 
@@ -182,3 +182,7 @@ esac
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_SDK_INSTALL_DIR="$HOME/zephyr-sdk"
 export PATH="$HOME/zephyr-sdk/arm-zephyr-eabi/bin:$PATH"
+#
+# DOTNET
+export DOTNET_ROOT=$HOME/.dotnet9/
+export PATH=$DOTNET_ROOT:$PATH

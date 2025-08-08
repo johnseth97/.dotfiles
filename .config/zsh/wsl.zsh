@@ -1,10 +1,24 @@
-#!/bin/zsh
-# WSL-Specific ZSH Configuration
+# ~/.config/zsh/wsl.zsh
+# bail if not in WSL
+grep -qi microsoft /proc/version || return
 
-echo "🔹 Loading WSL config..."
+echo "🔹 Detected WSL; re-injecting full Windows PATH…"
 
-# Source /etc/profile for windows path on non-login shells
-source /etc/profile
+# 1) pull the Windows PATH string
+windows_path=$(
+  cmd.exe /C "echo %PATH%" 2>/dev/null \
+  | tr -d '\r'
+)
+
+# 2) split on ';' and convert each to a POSIX mount
+fix_wsl2_interop() {
+    for i in $(pstree -np -s $$ | grep -o -E '[0-9]+'); do
+        if [[ -e "/run/WSL/${i}_interop" ]]; then
+            export WSL_INTEROP=/run/WSL/${i}_interop
+        fi
+    done
+}
+
 
 # Alias Windows SSH utilities
 alias ssh='ssh.exe'
@@ -14,15 +28,6 @@ alias clip='clip.exe'
 # Set truecolors for windows terminal
 export TERM="xterm-256color"
 export COLORTERM="truecolor"
-
-# Detect Windows user home directory
-windows_userprofile=$(cmd.exe /C "<nul set /p=%USERPROFILE%" 2>/dev/null | tr -d '\r')
-if [[ -n "$windows_userprofile" ]]; then
-  export WINHOME=$(wslpath "$windows_userprofile")
-  export IS_WSL=1
-else
-  echo "⚠️ Could not detect Windows user profile. Is WSL interop enabled?"
-fi
 
 export PATH=$PATH:/opt/mssql-tools18/bin
 
