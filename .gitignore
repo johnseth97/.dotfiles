@@ -51,7 +51,6 @@ sketchybarrc
 # Ignoring unneeded files in .config
 *.bak
 testing/**/*
-.config/tmux/plugins/
 .config/nvim.bak/
 .config/fontforge/
 .config/.DS_Store
