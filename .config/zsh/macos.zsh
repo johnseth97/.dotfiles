@@ -29,3 +29,6 @@ else
   echo "[1Password] Skipping Git integration - 1Password CLI not found."
 fi
 
+# Dotnet
+export DOTNET_ROOT="$(brew --prefix)/share/dotnet"
+export PATH="$DOTNET_ROOT:$PATH"
