@@ -186,3 +186,7 @@ export PATH="$HOME/zephyr-sdk/arm-zephyr-eabi/bin:$PATH"
 # DOTNET
 export DOTNET_ROOT=$HOME/.dotnet9/
 export PATH=$DOTNET_ROOT:$PATH
+
+# CARGO
+export CARGO_ROOT=$HOME/.cargo/bin/
+export PATH=$CARGO_ROOT:$PATH
