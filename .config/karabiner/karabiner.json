@@ -5,12 +5,12 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "Use right_option + JKL; as Arrow Keys",
+                        "description": "Use right_command + JKL; as Arrow Keys",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "j",
-                                    "modifiers": { "mandatory": ["right_option"] }
+                                    "modifiers": { "mandatory": ["right_command"] }
                                 },
                                 "to": [{ "key_code": "left_arrow" }],
                                 "type": "basic"
@@ -18,7 +18,7 @@
                             {
                                 "from": {
                                     "key_code": "k",
-                                    "modifiers": { "mandatory": ["right_option"] }
+                                    "modifiers": { "mandatory": ["right_command"] }
                                 },
                                 "to": [{ "key_code": "down_arrow" }],
                                 "type": "basic"
@@ -26,7 +26,7 @@
                             {
                                 "from": {
                                     "key_code": "l",
-                                    "modifiers": { "mandatory": ["right_option"] }
+                                    "modifiers": { "mandatory": ["right_command"] }
                                 },
                                 "to": [{ "key_code": "up_arrow" }],
                                 "type": "basic"
@@ -34,7 +34,7 @@
                             {
                                 "from": {
                                     "key_code": "semicolon",
-                                    "modifiers": { "mandatory": ["right_option"] }
+                                    "modifiers": { "mandatory": ["right_command"] }
                                 },
                                 "to": [{ "key_code": "right_arrow" }],
                                 "type": "basic"
