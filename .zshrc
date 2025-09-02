@@ -190,3 +190,8 @@ export PATH=$DOTNET_ROOT:$PATH
 # CARGO
 export CARGO_ROOT=$HOME/.cargo/bin/
 export PATH=$CARGO_ROOT:$PATH
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/ejohnson/.lmstudio/bin"
+# End of LM Studio CLI section
+
