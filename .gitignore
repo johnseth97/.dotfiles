@@ -82,3 +82,4 @@ testing/**/*
 .config/lnav
 .config/btop/btop.log.1
 .config/swiftpm
+.config/StardewValley
