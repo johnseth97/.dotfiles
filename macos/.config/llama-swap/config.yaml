@@ -1,0 +1,84 @@
+healthCheckTimeout: 900
+logLevel: info
+startPort: 10800
+
+macros:
+  models: "/Users/ejohnson/models"
+  lsrv: >
+    /opt/homebrew/bin/llama-server
+    --port ${PORT}
+    --host 127.0.0.1
+    -ngl 99
+    --flash-attn on
+    --no-warmup
+
+models:
+
+  # ---- persistent tier ----------------------------------------------------
+
+  "embed":
+    cmd: >
+      ${lsrv}
+      -m ${models}/nomic-embed/nomic-embed-text-v1.5.Q8_0.gguf
+      --embeddings
+      --ctx-size 8192
+      --pooling mean
+    ttl: 1200
+
+  # ---- swappable tier -----------------------------------------------------
+
+  "coder-flash":
+    cmd: >
+      ${lsrv}
+      -m ${models}/Qwen3.6-35B-A3B/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf
+      --ctx-size 65536
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --jinja
+      --temp 0.7 --top-p 0.8 --top-k 20
+    aliases: ["gpt-4o", "default"]
+    ttl: 900
+
+  # The everyday coding profile: same model and KV precision, with a bounded
+  # interactive context instead of reserving capacity for a 64k agent run.
+  "coder-interactive":
+    cmd: >
+      ${lsrv}
+      -m ${models}/Qwen3.6-35B-A3B/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf
+      --ctx-size 32768
+      --parallel 1
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --jinja
+      --temp 0.7 --top-p 0.8 --top-k 20
+    ttl: 900
+
+  "coder-27b":
+    cmd: >
+      ${lsrv}
+      -m ${models}/Qwen3.6-27B/Qwen3.6-27B-UD-Q4_K_XL.gguf
+      --ctx-size 65536
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --jinja
+      --temp 0.7 --top-p 0.8 --top-k 20
+    ttl: 600
+
+  "coder-next":
+    cmd: >
+      ${lsrv}
+      -m ${models}/Qwen3-Coder-Next/Qwen3-Coder-Next-UD-Q4_K_XL.gguf
+      --ctx-size 16384
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --jinja
+      --temp 1.0 --top-p 0.95 --top-k 40
+    ttl: 300
+
+groups:
+  resident:
+    swap: false
+    exclusive: false
+    persistent: true
+    members: ["embed"]
+
+  heavy:
+    swap: true
+    exclusive: true
+    members: ["coder-flash", "coder-27b", "coder-next"]

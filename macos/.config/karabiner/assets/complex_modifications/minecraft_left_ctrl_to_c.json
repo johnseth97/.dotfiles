@@ -1,0 +1,40 @@
+{
+  "title": "Minecraft: Left Control to C",
+  "rules": [
+    {
+      "description": "Prism/Minecraft only: map Left Control to C to avoid macOS Ctrl+Click right click",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "left_control"
+          },
+          "to": [
+            {
+              "key_code": "c"
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": [
+                "^org\\.prismlauncher\\.PrismLauncher$",
+                "^net\\.java\\.openjdk\\.cmd$",
+                "^com\\.oracle\\.java$",
+                "^com\\.azul\\.zulu\\.java$",
+                "^org\\.lwjgl\\.glfw$"
+              ],
+              "file_paths": [
+                "^/opt/homebrew/bin/prismlauncher$",
+                "^/Applications/PrismLauncher\\.app/.*$",
+                "^.*/PrismLauncher\\.app/.*$",
+                "^.*/java$",
+                "^.*/java_home$"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

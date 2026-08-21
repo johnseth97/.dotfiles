@@ -1,0 +1,23 @@
+{
+  "trustedtaps": [
+    "arl/arl",
+    "buo/cask-upgrade",
+    "danielgatis/imgcat",
+    "felixkratz/formulae",
+    "jorgelbg/tap",
+    "jorgerojas26/lazysql",
+    "koekishiya/formulae",
+    "nikitabobko/tap",
+    "oven-sh/bun",
+    "thezoraiz/ascii-image-converter"
+  ],
+  "trustedformulae": [
+    "/users/ejohnson/src/homebrew/brew-watchtower/brew-watchtower",
+    "asmvik/formulae/skhd",
+    "asmvik/formulae/yabai",
+    "gromgit/fuse/sshfs-mac",
+    "johnseth97/brew-watchtower/brew-watchtower",
+    "matheusml/zsh-ai/zsh-ai",
+    "mostlygeek/llama-swap/llama-swap"
+  ]
+}

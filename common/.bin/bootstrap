@@ -1,0 +1,119 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  cat <<'EOF'
+Usage: bootstrap [--platform PLATFORM] [--dry-run] [--skip-packages] [--skip-tmux-plugins]
+
+Prepare this checkout on the current host and deploy its Stow packages.
+
+Platforms: auto (default), macos, linux, wsl
+EOF
+}
+
+platform=auto
+dry_run=0
+skip_packages=0
+install_tmux_plugins=1
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --platform)
+      [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+      platform=$2
+      shift 2
+      ;;
+    --dry-run) dry_run=1; shift ;;
+    --skip-packages) skip_packages=1; shift ;;
+    --skip-tmux-plugins) install_tmux_plugins=0; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+repo_dir=$(CDPATH= cd -- "$script_dir/../.." && pwd -P)
+
+if [ "$platform" = auto ]; then
+  case "$(uname -s)" in
+    Darwin) platform=macos ;;
+    Linux)
+      if grep -qi microsoft /proc/version 2>/dev/null; then platform=wsl; else platform=linux; fi
+      ;;
+    *) printf 'Unsupported host: %s\n' "$(uname -s)" >&2; exit 1 ;;
+  esac
+fi
+case "$platform" in macos|linux|wsl) ;; *) printf 'Unsupported platform: %s\n' "$platform" >&2; exit 2 ;; esac
+
+run() {
+  if [ "$dry_run" -eq 1 ]; then
+    printf '+ '
+    printf '%s ' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
+}
+
+install_with_system_manager() {
+  case "$platform" in
+    macos)
+      if ! command -v brew >/dev/null 2>&1; then
+        if ! xcode-select -p >/dev/null 2>&1; then
+          printf '%s\n' 'Install Command Line Tools first: xcode-select --install' >&2
+          exit 1
+        fi
+        if [ "$dry_run" -eq 1 ]; then
+          printf '%s\n' '+ install Homebrew from https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh'
+        else
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+      fi
+      run brew bundle --file "$repo_dir/macos/Brewfile"
+      ;;
+    linux|wsl)
+      if command -v brew >/dev/null 2>&1; then
+        run brew install git stow zsh antidote tmux node zoxide
+      elif command -v apt-get >/dev/null 2>&1; then
+        run sudo apt-get update
+        run sudo apt-get install -y git stow zsh tmux nodejs npm zoxide
+        if apt-cache show zsh-antidote >/dev/null 2>&1; then run sudo apt-get install -y zsh-antidote; fi
+      elif command -v dnf >/dev/null 2>&1; then
+        run sudo dnf install -y git stow zsh tmux nodejs npm zoxide
+        if dnf info antidote >/dev/null 2>&1; then run sudo dnf install -y antidote; fi
+      elif command -v pacman >/dev/null 2>&1; then
+        run sudo pacman -S --needed --noconfirm git stow zsh tmux antidote nodejs npm zoxide
+      else
+        printf '%s\n' 'No supported package manager found (Homebrew, apt, dnf, or pacman).' >&2
+        exit 1
+      fi
+      run npm install --global --prefix "$HOME/.local" \
+        @agentclientprotocol/claude-agent-acp \
+        @agentclientprotocol/codex-acp
+      ;;
+  esac
+}
+
+printf 'Bootstrap platform: %s\n' "$platform"
+[ "$skip_packages" -eq 1 ] || install_with_system_manager
+
+command -v git >/dev/null 2>&1 || { printf '%s\n' 'Git is required after package installation.' >&2; exit 1; }
+run git -C "$repo_dir" submodule sync --recursive
+run git -C "$repo_dir" submodule update --init --recursive
+if [ "$dry_run" -eq 1 ]; then
+  run "$script_dir/dotfiles-stow" --dry-run
+else
+  run "$script_dir/dotfiles-stow"
+fi
+
+if [ "$install_tmux_plugins" -eq 1 ] && [ "$dry_run" -eq 0 ]; then
+  tpm="$HOME/.config/tmux/plugins/tpm/bin/install_plugins"
+  if [ -x "$tpm" ]; then
+    "$tpm"
+  else
+    printf '%s\n' 'TPM is unavailable after deployment; use --skip-tmux-plugins only if this is intentional.' >&2
+    exit 1
+  fi
+fi
+
+printf '%s\n' 'Bootstrap complete. Run bootstrap-git-signing separately if you use 1Password SSH signing.'

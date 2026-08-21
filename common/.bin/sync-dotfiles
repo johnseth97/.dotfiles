@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
+
+if ! git -C "$REPO_DIR" diff --quiet || ! git -C "$REPO_DIR" diff --cached --quiet; then
+  printf '%s\n' 'Refusing to sync: the dotfiles worktree has changes. Commit, stash, or discard them explicitly first.' >&2
+  exit 1
+fi
+
+git -C "$REPO_DIR" pull --ff-only origin main
+git -C "$REPO_DIR" submodule update --init --recursive
+exec "$SCRIPT_DIR/dotfiles-stow" --restow

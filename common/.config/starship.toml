@@ -1,0 +1,43 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = true
+
+# Increase command timeout for connections to remote folders
+command_timeout = 500
+
+
+# Prompt format
+format = """╭─ $all\n╰─$character """
+right_format = """$cmd_duration$time$status"""
+
+[character]
+format = "$symbol "
+success_symbol = '[❯](bold green)'
+error_symbol = '[❯](bold red)'
+
+[line_break]
+disabled = true
+
+[time]
+disabled = false
+
+[cmd_duration]
+disabled = false
+min_time = 0
+show_notifications = true
+min_time_to_notify = 45_000
+
+[package]
+disabled = false
+
+[aws]
+disabled = true
+
+[git_metrics]
+disabled = true
+
+[sudo]
+disabled = false
+symbol = '👨🏼‍💻 '

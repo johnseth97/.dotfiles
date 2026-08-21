@@ -1,0 +1,44 @@
+# GNU Stow ignores.  These are package-relative Perl regular expressions, not
+# Git ignore patterns.  Keep the default Stow housekeeping exclusions here:
+# a package-local list replaces Stow's built-in default list.
+
+RCS
+.+,v
+CVS
+\.\#.+
+\.cvsignore
+\.svn
+_darcs
+\.hg
+\.git
+\.gitignore
+\.gitmodules
+.+~
+\#.*\#
+
+# Files written by macOS or applications, never portable configuration.
+^/\.config/\.DS_Store$
+^/\.scripts/\.DS_Store$
+^/\.config/opencode/node_modules(?:/|$)
+
+# Credentials, private connection profiles, and game-save state must never be
+# deployed from the dotfiles package.
+^/\.config/1Password(?:/|$)
+^/\.config/github-copilot(?:/|$)
+^/\.config/OpenVPN(?:/|$)
+^/\.config/StardewValley(?:/|$)
+^/\.config/fish(?:/|$)
+^/\.config/raycast(?:/|$)
+^/\.config/swiftbar(?:/|$)
+^/\.config/wireshark(?:/|$)
+^/\.config/zed(?:/|$)
+
+# Keep only the reviewed, portable files from mixed configuration directories.
+^/\.config/btop/btop\.log(?:\..*)?$
+^/\.config/op/config$
+^/\.config/op/plugins/used_items(?:/|$)
+^/\.config/opencode/(?:node_modules|package\.json|package-lock\.json|bun\.lock)(?:/|$)
+
+# TPM itself is a pinned submodule.  Its installed plugins are mutable runtime
+# checkouts owned by TPM, rather than files owned by this Stow package.
+^/\.config/tmux/plugins/(?!tpm(?:/|$)).*

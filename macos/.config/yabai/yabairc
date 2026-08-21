@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# ============================================================
+# yabai base config
+# ============================================================
+
+# Binary Space Partitioning layout
+yabai -m config layout bsp
+yabai -m config window_placement second_child
+
+# Mouse config
+yabai -m config mouse_modifier fn
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_follows_focus on
+yabai -m config mouse_drop_action swap
+
+# Padding and gaps
+yabai -m config top_padding 12
+yabai -m config bottom_padding 12
+yabai -m config left_padding 12
+yabai -m config right_padding 12
+yabai -m config window_gap 12
+
+# ============================================================
+# Space labels
+# ============================================================
+# Make sure these desktops exist first.
+#
+# Desktop 1: Ghostty
+# Desktop 2: ChatGPT
+# Desktop 3: Safari
+# Desktop 4: Discord
+# Desktop 5: Messages | Mail
+
+yabai -m space 1 --label term
+yabai -m space 2 --label chat
+yabai -m space 3 --label web
+yabai -m space 4 --label comms
+yabai -m space 5 --label inbox
+
+# ============================================================
+# App routing rules
+# ============================================================
+# These apply to newly-created windows.
+#
+# Note:
+# These move matching new windows to their assigned spaces without
+# running a global rearrange script or changing focus to Mail/Messages.
+
+yabai -m rule --add app="^Ghostty$" space=term
+yabai -m rule --add app="^ChatGPT$" space=chat
+yabai -m rule --add app="^Safari$" space=web
+yabai -m rule --add app="^Discord$" space=comms
+yabai -m rule --add app="^Messages$" space=inbox
+yabai -m rule --add app="^Mail$" space=inbox
+
+# ============================================================
+# Floating / sticky / above rules
+# ============================================================
+# manage=off removes from BSP tiling.
+# sticky=on pins across spaces.
+# layer=above keeps above normal tiled windows.
+#
+# Check exact app names with:
+# yabai -m query --windows | jq -r '.[].app' | sort -u
+
+yabai -m rule --add app="^System Settings$" manage=off
+
+yabai -m rule --add app="^Calculator$" manage=off sticky=on layer=above
+yabai -m rule --add app="^iPhone Mirroring$" manage=off sticky=on layer=above
+yabai -m rule --add app="^Prism Launcher$" manage=off sticky=on layer=above
+
+# Finder is better unmanaged/above, but usually not sticky.
+# Sticky Finder tends to become annoying because every Finder window follows you.
+yabai -m rule --add app="^Finder$" manage=off layer=above
+
+# ============================================================
+# Optional border styles
+# ============================================================
+# Requires scripting addition / SIP changes.
+#
+# yabai -m config window_border on
+# yabai -m config window_border_width 2
+# yabai -m config active_window_border_color 0xffa6e3a1
+# yabai -m config normal_window_border_color 0xff585b70
+
+# ============================================================
+# Signals
+# ============================================================
+
+# Arrange currently open windows once when yabai starts.
+# This is safe because arrange-existing.sh restores the original focus.
+"$HOME/.config/yabai/arrange-existing.sh" &
+
+# Do NOT run arrange-existing.sh on application_launched or window_created.
+# That causes every new window to run the full global reset and can yank
+# focus back to the inbox space / Mail / Messages.
+#
+# Bad:
+# yabai -m signal --add event=application_launched action="$HOME/.config/yabai/arrange-existing.sh"
+# yabai -m signal --add event=window_created action="$HOME/.config/yabai/arrange-existing.sh"
+
+# Restart skhd if Dock restarts.
+yabai -m signal --add event=dock_did_restart action="launchctl kickstart -k gui/$(id -u)/homebrew.mxcl.skhd"

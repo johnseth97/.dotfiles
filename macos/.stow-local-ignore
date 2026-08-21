@@ -1,0 +1,19 @@
+# GNU Stow ignores.  This package-local list replaces Stow's built-in default
+# list, so retain its housekeeping exclusions.
+
+RCS
+.+,v
+CVS
+\.\#.+
+\.cvsignore
+\.svn
+_darcs
+\.hg
+\.git
+\.gitignore
+\.gitmodules
+.+~
+\#.*\#
+
+# Karabiner creates automatic backups; they are host-local recovery state.
+^/\.config/karabiner/automatic_backups(?:/|$)

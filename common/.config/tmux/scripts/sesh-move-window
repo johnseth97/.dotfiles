@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# Move the calling tmux window either within its current session or into an
+# existing tmux/Sesh session target.
+
+set -euo pipefail
+
+notify() {
+  # Keep this visible long enough to read after a short-lived popup closes.
+  tmux display-message -d 5000 "$1" 2>/dev/null || printf '%s\n' "$1" >&2
+}
+
+on_error() {
+  local status=$?
+  notify "Move window failed (exit ${status}); run the helper directly for details."
+  exit "$status"
+}
+
+trap on_error ERR
+
+usage() {
+  printf 'Usage: %s {insert WINDOW_ID [INDEX]|move WINDOW_ID TARGET}\n' "${0##*/}" >&2
+  exit 64
+}
+
+require_window() {
+  local window_id="$1"
+  tmux display-message -p -t "$window_id" '#{window_id}' >/dev/null 2>&1 || {
+    notify 'Move window: source window no longer exists.'
+    exit 1
+  }
+}
+
+insert_window() {
+  local window_id="$1"
+  local destination="${2:-}"
+  require_window "$window_id"
+
+  local session source_index base_index max_index temporary index
+  session="$(tmux display-message -p -t "$window_id" '#{session_name}')"
+  source_index="$(tmux display-message -p -t "$window_id" '#{window_index}')"
+  base_index="$(tmux show-options -gv base-index)"
+
+  if [[ -z "$destination" ]]; then
+    printf 'Insert window %s at index [%s]: ' "$source_index" "$source_index" >/dev/tty
+    IFS= read -r destination </dev/tty || exit 0
+  fi
+  destination="${destination:-$source_index}"
+
+  if [[ ! "$destination" =~ ^[0-9]+$ ]] || (( destination < base_index )); then
+    notify "Move window: enter an index of ${base_index} or greater."
+    exit 1
+  fi
+  if (( destination == source_index )); then
+    notify "Move window: already at index ${destination}."
+    return
+  fi
+
+  max_index="$(tmux list-windows -t "$session" -F '#{window_index}' | sort -n | tail -n 1)"
+  temporary=$((max_index + 1))
+  tmux move-window -s "$window_id" -t "${session}:${temporary}"
+
+  if (( source_index > destination )); then
+    # Window indexes can be sparse (for example, 1 and 6).  Shift only
+    # windows that actually exist; walking every integer would fail on gaps.
+    # Descending order prevents a shift from overwriting its next target.
+    while IFS= read -r index; do
+      (( index >= destination && index < source_index )) || continue
+      tmux move-window -s "${session}:${index}" -t "${session}:$((index + 1))"
+    done < <(
+      tmux list-windows -t "$session" -F '#{window_id} #{window_index}' |
+        awk -v window_id="$window_id" '$1 != window_id { print $2 }' |
+        sort -rn
+    )
+  else
+    # Ascending order prevents a shift from overwriting its previous target.
+    while IFS= read -r index; do
+      (( index > source_index && index <= destination )) || continue
+      tmux move-window -s "${session}:${index}" -t "${session}:$((index - 1))"
+    done < <(
+      tmux list-windows -t "$session" -F '#{window_id} #{window_index}' |
+        awk -v window_id="$window_id" '$1 != window_id { print $2 }' |
+        sort -n
+    )
+  fi
+
+  # Keep targeting the stable tmux window ID: numeric indexes may be sparse.
+  tmux move-window -s "$window_id" -t "${session}:${destination}"
+}
+
+move_to_target() {
+  local window_id="$1"
+  local target="$2"
+  require_window "$window_id"
+
+  local source_session target_session
+  source_session="$(tmux display-message -p -t "$window_id" '#{session_name}')"
+  target_session="$(tmux display-message -p -t "$target" '#{session_name}' 2>/dev/null)" || {
+    notify "Move window: tmux target not found: ${target}."
+    exit 1
+  }
+  [[ "$source_session" == "$target_session" ]] && return 0
+
+  tmux move-window -s "$window_id" -t "${target_session}:"
+}
+
+case "${1:-}" in
+  insert)
+    [[ $# -eq 2 || $# -eq 3 ]] || usage
+    insert_window "$2" "${3:-}"
+    ;;
+  move)
+    [[ $# -eq 3 ]] || usage
+    move_to_target "$2" "$3"
+    ;;
+  *) usage ;;
+esac

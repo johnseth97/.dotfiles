@@ -1,0 +1,35 @@
+{
+  "title": "Minecraft Left Control Remap",
+  "rules": [
+    {
+      "description": "Map Left Control to F13 only when Java/Minecraft is focused",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "left_control",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "f13"
+            }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "file_paths": [
+                "^/Library/Java/JavaVirtualMachines/.+/Contents/Home/bin/java$",
+                "^/Users/[^/]+/Library/Application Support/PrismLauncher/.+/java$",
+                "^/Applications/PrismLauncher\\.app/.+$",
+                "^/opt/homebrew/bin/prismlauncher$"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

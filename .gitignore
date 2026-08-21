@@ -1,0 +1,102 @@
+# System and Editor Files
+.DS_Store
+*.bak
+*.old
+*~
+*.swp
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Git Metadata
+.git/config
+.git/modules/
+!.gitignore
+.gitconfig
+
+# Package and Dependency Files
+node_modules/
+venv/
+.venv/
+package-lock.json
+yarn.lock
+
+# Build Artifacts
+*.o
+*.out
+*.class
+
+# User-Specific Config
+.env
+.history
+
+# Generated Assets
+themes/
+*.webp
+*.svg
+
+# Application-Specific
+bin/
+plugins/
+*.lock
+lazy-lock.json
+
+# Ignore specific tools
+*.plist
+sketchybarrc
+
+# Ignoring unneeded files in /common/.config
+*.bak
+testing/**/*
+/common/.config/nvim.bak/
+!/common/.config/tmux/plugins/
+/common/.config/tmux/plugins/*
+!/common/.config/tmux/plugins/tpm/
+/common/.config/fontforge/
+/common/.config/.DS_Store
+/common/.config/Autodesk/
+/common/.config/OpenVPN/
+/common/.config/coc/
+/common/.config/github-copilot/
+/common/.config/gtk-2.0/
+/common/.config/iterm2/AppSupport/
+/common/.config/iterm2/sockets/
+/common/.config/iterm2/.DS_Store
+/common/.config/wireshark/
+/common/.config/fish/
+/common/.config/1Password/
+
+# Local recovery and generated Homebrew artifacts
+/archive/
+/macos/Brewfile.backup-*
+
+# Specific Configurations
+/common/.config/iterm2/
+/common/.config/github-copilot/
+/common/.config/wireshark/
+/common/.config/go/telemetry/local
+/common/.config/op/config
+/macos/.config/karabiner/automatic_backups
+/common/.config/gh/hosts.yml
+/common/.config/gh/config.yml
+/common/.config/nextjs-nodejs/config.json
+/common/.config/uv/uv-receipt.json
+/common/.config/lnav
+/common/.config/btop/btop.log.1
+!/common/.config/btop/themes/
+!/common/.config/btop/themes/*.theme
+/common/.config/swiftpm
+/common/.config/StardewValley
+/common/.config/zed/prompts/prompts-library-db.0.mdb
+/common/.config/moltbook
+/common/.config/openlogi
+/common/.config/ratty.toml
+/common/.config/zed
+/.claude
+
+# Contains a live DB connection string (plaintext credential). Keep the
+# file on disk for lazysql, but never track it. See
+# ~/.agent-info/security/sql-credential-exposure-remediation.md
+/common/.config/lazysql/config.toml

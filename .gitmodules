@@ -1,0 +1,6 @@
+[submodule "common/.config/nvim"]
+	path = common/.config/nvim
+	url = git@github-personal:johnseth97/kickstart.nvim
+[submodule "common/.config/tmux/plugins/tpm"]
+	path = common/.config/tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm

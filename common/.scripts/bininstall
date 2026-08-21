@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage: bininstall <binary_url> [--checksum <checksum_url>] [install_dir]
+  binary_url       Direct link to the executable (or .tar.gz / .zip)
+  --checksum URL   Link to the .sha256 checksum file
+  install_dir      Where to install (default: /usr/local/bin)
+EOF
+  exit 1
+}
+
+if [[ $# -lt 1 ]]; then
+  usage
+fi
+
+BIN_URL="$1"; shift
+CHECKSUM_URL=""
+DEST_DIR="/usr/local/bin"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --checksum)
+      [[ $# -ge 2 ]] || { echo "Error: --checksum requires a URL"; usage; }
+      CHECKSUM_URL="$2"; shift 2
+      ;;
+    *)
+      DEST_DIR="$1"; shift
+      ;;
+  esac
+done
+
+# Filenames in /tmp
+BIN_FILE="${BIN_URL##*/}"
+TMP_BIN="/tmp/${BIN_FILE}"
+
+echo "→ Downloading $BIN_FILE to $TMP_BIN…"
+curl -fSL "$BIN_URL" -o "$TMP_BIN"
+
+if [[ -n "$CHECKSUM_URL" ]]; then
+  CHK_FILE="${CHECKSUM_URL##*/}"
+  TMP_CHK="/tmp/${CHK_FILE}"
+
+  echo "→ Downloading checksum $CHK_FILE to $TMP_CHK…"
+  curl -fSL "$CHECKSUM_URL" -o "$TMP_CHK"
+
+  echo "→ Verifying checksum…"
+  (
+    cd /tmp
+    sha256sum --check --ignore-missing "$CHK_FILE"
+  ) && echo "✔ Checksum OK" || { echo "✘ Checksum MISMATCH"; exit 1; }
+fi
+
+# Helper to install a single file
+install_file() {
+  local src="$1" dst_name="$2"
+  chmod +x "$src"
+  echo "→ Installing $dst_name to $DEST_DIR…"
+  sudo mv "$src" "$DEST_DIR/$dst_name"
+}
+
+case "$BIN_FILE" in
+  *.tar.gz)
+    TMP_DIR=$(mktemp -d)
+    tar -xzf "$TMP_BIN" -C "$TMP_DIR"
+    # find the first executable regular file
+    FOUND=$(find "$TMP_DIR" -maxdepth 1 -type f -perm /111 | head -n1)
+    [[ -n "$FOUND" ]] || { echo "❌ No executable found in $BIN_FILE"; exit 1; }
+    install_file "$FOUND" "$(basename "$FOUND")"
+    rm -rf "$TMP_DIR"
+    ;;
+  *.zip)
+    TMP_DIR=$(mktemp -d)
+    unzip -q "$TMP_BIN" -d "$TMP_DIR"
+    FOUND=$(find "$TMP_DIR" -maxdepth 1 -type f -perm /111 | head -n1)
+    [[ -n "$FOUND" ]] || { echo "❌ No executable found in $BIN_FILE"; exit 1; }
+    install_file "$FOUND" "$(basename "$FOUND")"
+    rm -rf "$TMP_DIR"
+    ;;
+  *)
+    # plain binary
+    install_file "$TMP_BIN" "$BIN_FILE"
+    ;;
+esac
+
+echo "✔ Done."  

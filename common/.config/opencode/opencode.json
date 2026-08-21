@@ -1,0 +1,61 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "enabled_providers": ["llama-swap"],
+  "model": "llama-swap/coder-interactive",
+  "mcp": {
+    "everything": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-everything@2026.7.4"
+      ],
+      "enabled": false
+    }
+  },
+  "provider": {
+    "llama-swap": {
+      "name": "llama-swap (local)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "coder-interactive": {
+          "name": "Coder Interactive (local)",
+          "tool_call": true,
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          }
+        },
+        "coder-flash": {
+          "name": "Coder Flash (local)",
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        },
+        "coder-27b": {
+          "name": "Coder 27B (local)",
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        },
+        "coder-next": {
+          "name": "Coder Next (local)",
+          "tool_call": true,
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          }
+        }
+      }
+    }
+  }
+}

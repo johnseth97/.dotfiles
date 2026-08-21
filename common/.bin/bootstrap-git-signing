@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+case "$(uname -s)" in
+  Darwin)
+    signer='/Applications/1Password.app/Contents/MacOS/op-ssh-sign'
+    ;;
+  Linux)
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+      windows_home=${WINHOME:-$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r' | wslpath -u)}
+      signer="$windows_home/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+    else
+      signer='/opt/1Password/op-ssh-sign'
+    fi
+    ;;
+  *)
+    printf 'Unsupported host: %s\n' "$(uname -s)" >&2
+    exit 1
+    ;;
+esac
+
+if [ ! -x "$signer" ]; then
+  printf '1Password SSH signing helper is not executable: %s\n' "$signer" >&2
+  exit 1
+fi
+
+git config --global gpg.format ssh
+git config --global gpg.ssh.program "$signer"
+printf '%s\n' 'Configured Git SSH signing through 1Password.'

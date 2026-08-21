@@ -1,0 +1,17 @@
+# Watchtower shell status and Brewfile drift settings.
+# The shell prompt command only reads this file and Watchtower status files.
+blurb=always
+prefix=⛫ Watchtower
+detect_brewfile_drift=1
+brewfile=/Users/ejohnson/.dotfiles/macos/Brewfile
+# Export always writes a generated snapshot, never the curated Brewfile above.
+export_brewfile=0
+export_path=/Users/ejohnson/.config/brew-watchtower/Brewfile.generated
+# groups.conf is Stow-managed and is the source of truth for group policy.
+groups_mode=declarative
+# Comma-separated TYPE:TOKEN exceptions for known classifier false positives.
+privileged_auto_allow=
+# Keep actionable update reports visible until acknowledged.
+blurb_alerts=until_acknowledged
+# Use `never` for terminals that do not render ANSI escape sequences.
+color=always

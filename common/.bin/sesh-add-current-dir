@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+# Add the tmux pane's working directory to zoxide, which is Sesh's portable
+# project source. tmux runs this helper with the pane directory as $PWD.
+
+set -eu
+
+notify() {
+  if [ -n "${TMUX:-}" ] && command -v tmux >/dev/null 2>&1; then
+    tmux display-message "$1"
+  else
+    printf '%s\n' "$1" >&2
+  fi
+}
+
+if ! command -v zoxide >/dev/null 2>&1; then
+  notify 'Sesh: zoxide is not installed; unable to add this directory.'
+  exit 1
+fi
+
+zoxide add "$(pwd -P)"
+
+# The refresh is harmless when Sesh caching is disabled, and makes the new
+# project available immediately when caching is enabled.
+if command -v sesh >/dev/null 2>&1; then
+  sesh cache refresh >/dev/null 2>&1 || true
+fi
+
+notify 'Sesh: added the current directory to the project picker.'
