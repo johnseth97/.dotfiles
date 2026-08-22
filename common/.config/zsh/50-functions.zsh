@@ -84,7 +84,11 @@ _dots() {
         '(-b --bundles)'{-b,--bundles}'[update bundles only]' \
         '(-n --dry-run)'{-n,--dry-run}'[show bundle updates without applying them]'
       ;;
-    sync|status)
+    sync)
+      _arguments -S \
+        '--check[report local drift, no network]'
+      ;;
+    status)
       _message 'this action accepts no options'
       ;;
   esac

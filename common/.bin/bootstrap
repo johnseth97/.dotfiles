@@ -71,7 +71,7 @@ sync_optional_repos() {
   printf '%s\n' "$DOTFILES_OPTIONAL_REPOS" | while IFS=: read -r name target; do
     [ -n "$name" ] || continue
     dest="$HOME/$target"
-    [ -d "$dest/.git" ] && continue
+    [ -e "$dest/.git" ] && continue
     run gh repo clone "$DOTFILES_GITHUB_USER/$name" "$dest"
   done
 }

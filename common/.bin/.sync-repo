@@ -1,14 +1,20 @@
 #!/bin/sh
 # Internal helper, not meant to be run directly: commit any pending changes
 # in a repo, pull, and push. Shared by sync-notes and sync-dotfiles (for
-# optional companion repos listed in repos.conf).
+# optional companion repos listed in repos.conf, and for sync-dotfiles's own
+# repo via --check).
 set -eu
 
 usage() {
   cat <<'EOF'
-Usage: .sync-repo <dir> [--dry-run]
+Usage: .sync-repo <dir> [--dry-run|--check]
 
 Commit any pending changes in <dir>, pull, and push.
+
+--dry-run prints pending changes without committing, pulling, or pushing.
+--check reports local drift (uncommitted/untracked changes, commits ahead or
+behind origin/main) without touching the network or the working tree; it
+prints one summary line, or nothing at all if <dir> is clean.
 EOF
 }
 
@@ -23,19 +29,42 @@ if [ -z "$dir" ]; then
 fi
 shift
 
-dry_run=0
+mode=sync
 case "${1:-}" in
-  --dry-run) dry_run=1 ;;
+  --dry-run) mode=dry-run ;;
+  --check) mode=check ;;
   '') ;;
   *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
 esac
 
-if [ ! -d "$dir/.git" ]; then
+if [ ! -e "$dir/.git" ]; then
   printf 'Not a git repository: %s\n' "$dir" >&2
   exit 1
 fi
 
-if [ "$dry_run" -eq 1 ]; then
+if [ "$mode" = check ]; then
+  msg=""
+  if ! git -C "$dir" diff --quiet || ! git -C "$dir" diff --cached --quiet; then
+    msg="uncommitted changes"
+  fi
+  if [ -n "$(git -C "$dir" ls-files --others --exclude-standard)" ]; then
+    msg="${msg:+$msg, }untracked files"
+  fi
+  if git -C "$dir" rev-parse --verify -q refs/remotes/origin/main >/dev/null 2>&1; then
+    counts=$(git -C "$dir" rev-list --left-right --count HEAD...origin/main 2>/dev/null) || counts=""
+    if [ -n "$counts" ]; then
+      set -- $counts
+      ahead=${1:-0}
+      behind=${2:-0}
+      [ "$ahead" -gt 0 ] && msg="${msg:+$msg, }$ahead ahead"
+      [ "$behind" -gt 0 ] && msg="${msg:+$msg, }$behind behind"
+    fi
+  fi
+  [ -z "$msg" ] || printf '%s\n' "$msg"
+  exit 0
+fi
+
+if [ "$mode" = dry-run ]; then
   git -C "$dir" status --short
   exit 0
 fi

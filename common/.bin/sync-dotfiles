@@ -3,16 +3,39 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: sync-dotfiles
+Usage: sync-dotfiles [--check]
 
 Fast-forward this checkout to origin/main, update pinned submodules, restow,
 and sync any optional companion repo (repos.conf) already cloned locally.
 Refuses to run if the worktree has uncommitted changes.
+
+--check reports local drift (uncommitted changes, commits ahead or behind
+origin/main) for this checkout and any cloned optional companion repo,
+without touching the network or the working tree. Silent if everything is
+in sync; meant to be run at shell startup.
 EOF
 }
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
+
+if [ "${1:-}" = --check ]; then
+  msg=$("$SCRIPT_DIR/.sync-repo" "$REPO_DIR" --check)
+  [ -z "$msg" ] || printf '[dotfiles] dotfiles: %s\n' "$msg"
+
+  if [ -f "$REPO_DIR/repos.conf" ]; then
+    # shellcheck disable=SC1090
+    . "$REPO_DIR/repos.conf"
+    printf '%s\n' "${DOTFILES_OPTIONAL_REPOS:-}" | while IFS=: read -r name target; do
+      [ -n "$name" ] || continue
+      dest="$HOME/$target"
+      [ -e "$dest/.git" ] || continue
+      repo_msg=$("$SCRIPT_DIR/.sync-repo" "$dest" --check)
+      [ -z "$repo_msg" ] || printf '[dotfiles] %s: %s\n' "$name" "$repo_msg"
+    done
+  fi
+  exit 0
+fi
 
 if [ "${1:-}" = --post-pull ]; then
   # Reached only via the re-exec below, once the pull has finished writing
@@ -29,7 +52,7 @@ if [ "${1:-}" = --post-pull ]; then
     printf '%s\n' "${DOTFILES_OPTIONAL_REPOS:-}" | while IFS=: read -r name target; do
       [ -n "$name" ] || continue
       dest="$HOME/$target"
-      [ -d "$dest/.git" ] || continue
+      [ -e "$dest/.git" ] || continue
       "$SCRIPT_DIR/.sync-repo" "$dest"
     done
   fi

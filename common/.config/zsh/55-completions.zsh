@@ -4,6 +4,7 @@
 
 _sync-dotfiles() {
   _arguments -S \
+    '--check[report local drift for this checkout and optional repos, no network]' \
     '(-h --help)'{-h,--help}'[show usage]'
 }
 compdef _sync-dotfiles sync-dotfiles
@@ -11,6 +12,7 @@ compdef _sync-dotfiles sync-dotfiles
 _sync-notes() {
   _arguments -S \
     '--dry-run[show pending changes without committing, pulling, or pushing]' \
+    '--check[report local drift, no network]' \
     '(-h --help)'{-h,--help}'[show usage]'
 }
 compdef _sync-notes sync-notes

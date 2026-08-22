@@ -72,7 +72,7 @@ particular change had something new to pull).
 | `30-integrations` | ghostty, antidote, zoxide, sesh, starship |
 | `40-aliases`, `50-functions` | interactive conveniences, `dots` |
 | `55-completions` | `compdef` completions for `common/.bin` scripts |
-| `85-banner`, `90-tmux`, `99-toolchains` | startup banner, tmux autostart, SDKs |
+| `85-banner`, `86-dotfiles-status`, `90-tmux`, `99-toolchains` | startup banner, `sync-dotfiles --check` drift notice, tmux autostart, SDKs |
 
 Add new config as a fragment; do not grow `.zshrc`. Guard anything that writes
 to stdout with `[[ $- == *i* && -t 1 ]]` — non-interactive and agent-bridge
@@ -119,6 +119,11 @@ repos that travel alongside this public one (`notes`, currently).
   never clones a missing one; that's `bootstrap`'s job.
 - Adding a new companion repo: create it on GitHub, add a `name:target` line
   to `repos.conf`, done — both scripts pick it up without further changes.
+- `sync-dotfiles --check` (run at every interactive shell start by
+  `86-dotfiles-status.zsh`, mirroring brew-watchtower's blurb) reports local
+  drift — uncommitted changes, commits ahead/behind `origin/main` — for this
+  checkout and every cloned companion repo. Local-only, no network fetch;
+  silent unless something's actually drifted.
 
 ## Submodules
 

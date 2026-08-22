@@ -3,13 +3,14 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: sync-notes [--dry-run]
+Usage: sync-notes [--dry-run|--check]
 
 Commit any pending changes in the notes repo, pull, and push.
 
 The repo defaults to $HOME/notes; override with the NOTES_DIR environment
 variable. --dry-run prints the pending changes without committing, pulling,
-or pushing.
+or pushing. --check reports local drift without touching the network;
+silent if clean.
 EOF
 }
 
