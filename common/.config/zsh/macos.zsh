@@ -3,18 +3,10 @@
 
 echo "🔹 Loading macOS config..."
 
-# Print blurb for watchtower if installed
-if command -v brew-watchtower &>/dev/null; then
-  brew-watchtower blurb
-else
-  echo "⚠️ brew-watchtower not installed!"
-  echo "   Install with: brew install johnseth97/tap/brew-watchtower"
-fi
-
-
 # Alias macos specific commands
 alias clip="pbcopy"
 alias paste="pbpaste"
+alias sync-brewfile="brew bundle --file ~/.dotfiles/macos/Brewfile"
 
 # This is unset by default on macOS, but we want to set it for consistency across systems
 export XDG_CONFIG_HOME="$HOME/.config"

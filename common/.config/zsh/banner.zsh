@@ -18,6 +18,22 @@ ALIASES=$(alias | wc -l | awk '{print $1}')
 PLUGINS=${#plugins[@]:-0}
 BANNER_TERMINFO=${TERMINFO_DIRS:-$TERMINFO}
 
+# Status lines: brew-watchtower (macOS only) and dotfiles/companion-repo sync
+# drift. Both stay empty when there's nothing to say, so they only add a
+# banner line when actually relevant.
+WATCHTOWER_STATUS=""
+if [[ "$OSTYPE" == darwin* ]]; then
+  if command -v brew-watchtower &>/dev/null; then
+    WATCHTOWER_STATUS=$(brew-watchtower blurb)
+  else
+    WATCHTOWER_STATUS="⚠️ brew-watchtower not installed (brew install johnseth97/tap/brew-watchtower)"
+  fi
+fi
+
+DOTFILES_STATUS=""
+if command -v sync-dotfiles &>/dev/null; then
+  DOTFILES_STATUS=$(sync-dotfiles --check)
+fi
 
 # Check if profiling is enabled
 if [[ "$ZSH_PROFILE_STARTUP" == "1" ]]; then
@@ -68,6 +84,8 @@ print -P "${CYAN}Terminfo:${MAGENTA} ${BANNER_TERMINFO}${RESET}"
 print -P "${CYAN}Loaded Plugins:${RED} ${PLUGINS}${RESET}"
 print -P "${CYAN}Aliases:${RED} ${ALIASES}${RESET}"
 print -P "${CYAN}Time:${YELLOW} ${TIME}${RESET}"
+[[ -n "$WATCHTOWER_STATUS" ]] && print -P "$WATCHTOWER_STATUS"
+[[ -n "$DOTFILES_STATUS" ]] && print -P "$DOTFILES_STATUS"
 
 # Print profiler summary if zprof is enabled
 if [[ "$ZSH_PROFILE_STARTUP" == "1" ]]; then
