@@ -123,7 +123,9 @@ repos that travel alongside this public one (`notes`, currently).
   `86-dotfiles-status.zsh`, mirroring brew-watchtower's blurb) reports local
   drift — uncommitted changes, commits ahead/behind `origin/main` — for this
   checkout and every cloned companion repo. Local-only, no network fetch;
-  silent unless something's actually drifted.
+  silent unless something's actually drifted. `DOTFILES_VERBOSE=1` (same
+  `=1` convention as `DOTFILES_SHOW_BANNER`) makes it also print an "in
+  sync" line for repos with nothing to report.
 
 ## Submodules
 

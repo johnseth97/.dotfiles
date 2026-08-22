@@ -12,7 +12,8 @@ Refuses to run if the worktree has uncommitted changes.
 --check reports local drift (uncommitted changes, commits ahead or behind
 origin/main) for this checkout and any cloned optional companion repo,
 without touching the network or the working tree. Silent if everything is
-in sync; meant to be run at shell startup.
+in sync; meant to be run at shell startup. Set DOTFILES_VERBOSE=1 to also
+print a line for repos that ARE in sync, not just drifted ones.
 EOF
 }
 
@@ -20,8 +21,21 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
 
 if [ "${1:-}" = --check ]; then
-  msg=$("$SCRIPT_DIR/.sync-repo" "$REPO_DIR" --check)
-  [ -z "$msg" ] || printf '[dotfiles] dotfiles: %s\n' "$msg"
+  verbose=0
+  [ "${DOTFILES_VERBOSE:-0}" = 1 ] && verbose=1
+
+  report_check() {
+    # $1 = dir, $2 = label. Prints drift if any; in verbose mode also prints
+    # an explicit "in sync" line when there's none.
+    _msg=$("$SCRIPT_DIR/.sync-repo" "$1" --check)
+    if [ -n "$_msg" ]; then
+      printf '[dotfiles] %s: %s\n' "$2" "$_msg"
+    elif [ "$verbose" -eq 1 ]; then
+      printf '[dotfiles] %s: in sync\n' "$2"
+    fi
+  }
+
+  report_check "$REPO_DIR" dotfiles
 
   if [ -f "$REPO_DIR/repos.conf" ]; then
     # shellcheck disable=SC1090
@@ -30,8 +44,7 @@ if [ "${1:-}" = --check ]; then
       [ -n "$name" ] || continue
       dest="$HOME/$target"
       [ -e "$dest/.git" ] || continue
-      repo_msg=$("$SCRIPT_DIR/.sync-repo" "$dest" --check)
-      [ -z "$repo_msg" ] || printf '[dotfiles] %s: %s\n' "$name" "$repo_msg"
+      report_check "$dest" "$name"
     done
   fi
   exit 0
