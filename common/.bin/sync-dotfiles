@@ -5,23 +5,42 @@ usage() {
   cat <<'EOF'
 Usage: sync-dotfiles
 
-Fast-forward this checkout to origin/main, update pinned submodules, and
-restow. Refuses to run if the worktree has uncommitted changes.
-
-Afterward, syncs (commit, pull, push) any optional companion repo listed in
-repos.conf that is already cloned at its target dir. It does not clone
-missing ones; that's bootstrap's job.
+Fast-forward this checkout to origin/main, update pinned submodules, restow,
+and sync any optional companion repo (repos.conf) already cloned locally.
+Refuses to run if the worktree has uncommitted changes.
 EOF
 }
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
+
+if [ "${1:-}" = --post-pull ]; then
+  # Reached only via the re-exec below, once the pull has finished writing
+  # this file's new content to disk — never on direct invocation. Re-exec'ing
+  # forces a fresh read of this file post-pull; without it, this branch would
+  # run whatever text the shell had already buffered for THIS invocation,
+  # i.e. the version of the script that existed before the pull that just
+  # rewrote it out from under itself.
+  "$SCRIPT_DIR/dotfiles-stow" --restow
+
+  if [ -f "$REPO_DIR/repos.conf" ]; then
+    # shellcheck disable=SC1090
+    . "$REPO_DIR/repos.conf"
+    printf '%s\n' "${DOTFILES_OPTIONAL_REPOS:-}" | while IFS=: read -r name target; do
+      [ -n "$name" ] || continue
+      dest="$HOME/$target"
+      [ -d "$dest/.git" ] || continue
+      "$SCRIPT_DIR/.sync-repo" "$dest"
+    done
+  fi
+  exit 0
+fi
 
 case "${1:-}" in
   -h|--help) usage; exit 0 ;;
   '') ;;
   *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
 esac
-
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
-REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
 
 if ! git -C "$REPO_DIR" diff --quiet || ! git -C "$REPO_DIR" diff --cached --quiet; then
   printf '%s\n' 'Refusing to sync: the dotfiles worktree has changes. Commit, stash, or discard them explicitly first.' >&2
@@ -30,15 +49,4 @@ fi
 
 git -C "$REPO_DIR" pull --ff-only origin main
 git -C "$REPO_DIR" submodule update --init --recursive
-"$SCRIPT_DIR/dotfiles-stow" --restow
-
-if [ -f "$REPO_DIR/repos.conf" ]; then
-  # shellcheck disable=SC1090
-  . "$REPO_DIR/repos.conf"
-  printf '%s\n' "${DOTFILES_OPTIONAL_REPOS:-}" | while IFS=: read -r name target; do
-    [ -n "$name" ] || continue
-    dest="$HOME/$target"
-    [ -d "$dest/.git" ] || continue
-    "$SCRIPT_DIR/.sync-repo" "$dest"
-  done
-fi
+exec "$SCRIPT_DIR/sync-dotfiles" --post-pull

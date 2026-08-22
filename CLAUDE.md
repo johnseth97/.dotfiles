@@ -48,6 +48,17 @@ ignored entirely — e.g. `.zshrc` loads its `[0-9][0-9]-*.zsh` fragments with a
 `(N)` null-glob, so if those symlinks are absent the loop silently matches
 nothing and you get a bare shell with no error.
 
+**`sync-dotfiles` re-execs itself after pulling, via a `--post-pull` guard.**
+It `git pull`s this repo — which can rewrite `sync-dotfiles`'s own file — then
+continues running. Without the re-exec, the interpreter keeps executing
+whatever text it already had buffered for this invocation: the version of the
+script from *before* the pull that just changed it, silently no-oping
+whatever was added after the pull step. `exec "$SCRIPT_DIR/sync-dotfiles"
+--post-pull` forces a fresh read of the file post-pull. If you touch this
+script, keep the post-pull logic inside that guarded branch — anything placed
+after the pull but outside it will intermittently not run (only when that
+particular change had something new to pull).
+
 ## Shell config
 
 `common/.zshrc` is only a loader. It sources
