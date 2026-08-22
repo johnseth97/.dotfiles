@@ -6,7 +6,7 @@ echo "🔹 Loading macOS config..."
 # Alias macos specific commands
 alias clip="pbcopy"
 alias paste="pbpaste"
-alias sync-brewfile="brew bundle --file ~/.dotfiles/macos/Brewfile"
+alias sync-brewfile="brew bundle dump --file ~/.dotfiles/macos/Brewfile --force"
 
 # This is unset by default on macOS, but we want to set it for consistency across systems
 export XDG_CONFIG_HOME="$HOME/.config"
