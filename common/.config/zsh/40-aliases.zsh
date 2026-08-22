@@ -12,6 +12,7 @@ alias tcurl='curl --proxy socks5h://127.0.0.1:9050'
 alias tmuxSeshIT117='~/.config/tmux/enviroments/IT117.sh'
 alias jquaste="pbpaste | nvim -c ':%!jq .' -c 'set filetype=json' -"
 alias ai="zsh-ai"
+alias notify-host='osc9-notify'
 
 # Dotfiles shortcuts. `dots` is the canonical dispatcher; these are mnemonic
 # shortcuts for interactive use.
