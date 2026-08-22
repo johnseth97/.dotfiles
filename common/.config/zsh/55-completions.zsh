@@ -30,6 +30,7 @@ _bootstrap() {
     '--dry-run[show work without changing the host]' \
     '--skip-packages[do not install system dependencies]' \
     '--skip-tmux-plugins[defer TPM plugin installation]' \
+    '--skip-optional-repos[do not clone optional companion repos]' \
     '(-h --help)'{-h,--help}'[show usage]'
 }
 compdef _bootstrap bootstrap

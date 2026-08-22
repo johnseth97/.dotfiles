@@ -93,6 +93,22 @@ Consequences to remember:
 - Verify by entry-point filename: `tmux-tokyo-night.tmux` is correct;
   `tmux-powerkit.tmux` means the wrong code is installed.
 
+## Optional companion repos
+
+`repos.conf` (repo root, not a Stow package member — never deployed to
+`$HOME`) names `DOTFILES_GITHUB_USER`, the default/parent GitHub profile,
+and `DOTFILES_OPTIONAL_REPOS`, a list of `name:target` pairs for private
+repos that travel alongside this public one (`notes`, currently).
+
+- `bootstrap` clones any listed repo that isn't already at `$HOME/<target>`,
+  via `gh repo clone $DOTFILES_GITHUB_USER/<name>`. Skip with
+  `--skip-optional-repos`.
+- `sync-dotfiles` syncs (commit any pending changes, pull, push — via the
+  internal `.sync-repo` helper) any listed repo that's already cloned. It
+  never clones a missing one; that's `bootstrap`'s job.
+- Adding a new companion repo: create it on GitHub, add a `name:target` line
+  to `repos.conf`, done — both scripts pick it up without further changes.
+
 ## Submodules
 
 `common/.config/nvim` (kickstart.nvim fork) and

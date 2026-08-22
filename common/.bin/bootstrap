@@ -3,9 +3,11 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: bootstrap [--platform PLATFORM] [--dry-run] [--skip-packages] [--skip-tmux-plugins]
+Usage: bootstrap [--platform PLATFORM] [--dry-run] [--skip-packages] [--skip-tmux-plugins] [--skip-optional-repos]
 
 Prepare this checkout on the current host and deploy its Stow packages.
+Also clones any optional companion repo listed in repos.conf (notes, etc.)
+that isn't already present at its target dir.
 
 Platforms: auto (default), macos, linux, wsl
 EOF
@@ -15,6 +17,7 @@ platform=auto
 dry_run=0
 skip_packages=0
 install_tmux_plugins=1
+skip_optional_repos=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -26,6 +29,7 @@ while [ "$#" -gt 0 ]; do
     --dry-run) dry_run=1; shift ;;
     --skip-packages) skip_packages=1; shift ;;
     --skip-tmux-plugins) install_tmux_plugins=0; shift ;;
+    --skip-optional-repos) skip_optional_repos=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
   esac
@@ -53,6 +57,23 @@ run() {
   else
     "$@"
   fi
+}
+
+sync_optional_repos() {
+  [ -f "$repo_dir/repos.conf" ] || return 0
+  # shellcheck disable=SC1090
+  . "$repo_dir/repos.conf"
+  [ -n "${DOTFILES_OPTIONAL_REPOS:-}" ] || return 0
+  command -v gh >/dev/null 2>&1 || {
+    printf '%s\n' 'gh is not installed; skipping optional companion repos.' >&2
+    return 0
+  }
+  printf '%s\n' "$DOTFILES_OPTIONAL_REPOS" | while IFS=: read -r name target; do
+    [ -n "$name" ] || continue
+    dest="$HOME/$target"
+    [ -d "$dest/.git" ] && continue
+    run gh repo clone "$DOTFILES_GITHUB_USER/$name" "$dest"
+  done
 }
 
 install_with_system_manager() {
@@ -105,6 +126,8 @@ if [ "$dry_run" -eq 1 ]; then
 else
   run "$script_dir/dotfiles-stow"
 fi
+
+[ "$skip_optional_repos" -eq 1 ] || sync_optional_repos
 
 if [ "$install_tmux_plugins" -eq 1 ] && [ "$dry_run" -eq 0 ]; then
   tpm="$HOME/.config/tmux/plugins/tpm/bin/install_plugins"

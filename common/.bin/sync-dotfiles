@@ -7,6 +7,10 @@ Usage: sync-dotfiles
 
 Fast-forward this checkout to origin/main, update pinned submodules, and
 restow. Refuses to run if the worktree has uncommitted changes.
+
+Afterward, syncs (commit, pull, push) any optional companion repo listed in
+repos.conf that is already cloned at its target dir. It does not clone
+missing ones; that's bootstrap's job.
 EOF
 }
 
@@ -26,4 +30,15 @@ fi
 
 git -C "$REPO_DIR" pull --ff-only origin main
 git -C "$REPO_DIR" submodule update --init --recursive
-exec "$SCRIPT_DIR/dotfiles-stow" --restow
+"$SCRIPT_DIR/dotfiles-stow" --restow
+
+if [ -f "$REPO_DIR/repos.conf" ]; then
+  # shellcheck disable=SC1090
+  . "$REPO_DIR/repos.conf"
+  printf '%s\n' "${DOTFILES_OPTIONAL_REPOS:-}" | while IFS=: read -r name target; do
+    [ -n "$name" ] || continue
+    dest="$HOME/$target"
+    [ -d "$dest/.git" ] || continue
+    "$SCRIPT_DIR/.sync-repo" "$dest"
+  done
+fi

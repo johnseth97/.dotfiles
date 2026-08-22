@@ -13,32 +13,11 @@ or pushing.
 EOF
 }
 
-dry_run=0
 case "${1:-}" in
   -h|--help) usage; exit 0 ;;
-  --dry-run) dry_run=1 ;;
-  '') ;;
-  *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
 esac
 
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 NOTES_DIR=${NOTES_DIR:-"$HOME/notes"}
 
-if [ ! -d "$NOTES_DIR/.git" ]; then
-  printf 'Not a git repository: %s\n' "$NOTES_DIR" >&2
-  exit 1
-fi
-
-if [ "$dry_run" -eq 1 ]; then
-  git -C "$NOTES_DIR" status --short
-  exit 0
-fi
-
-if ! git -C "$NOTES_DIR" diff --quiet \
-  || ! git -C "$NOTES_DIR" diff --cached --quiet \
-  || [ -n "$(git -C "$NOTES_DIR" ls-files --others --exclude-standard)" ]; then
-  git -C "$NOTES_DIR" add -A
-  git -C "$NOTES_DIR" commit -m "sync: $(date '+%Y-%m-%d %H:%M:%S')"
-fi
-
-git -C "$NOTES_DIR" pull --no-edit origin main
-git -C "$NOTES_DIR" push origin main
+exec "$script_dir/.sync-repo" "$NOTES_DIR" "$@"

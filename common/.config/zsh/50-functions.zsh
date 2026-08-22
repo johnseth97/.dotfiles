@@ -33,7 +33,8 @@ Usage: dots <action> [arguments]
 
   plan          preview a restow without changing $HOME
   deploy        restow packages for this platform
-  sync          fast-forward dotfiles and pinned submodules, then restow
+  sync          fast-forward dotfiles and pinned submodules, then restow,
+                then sync any optional companion repo already cloned locally
   bootstrap     install dependencies and deploy a new host
   shell-update  update Homebrew Antidote, then declared Antidote plugins
   status        show dotfiles worktree state
@@ -52,8 +53,8 @@ _dots() {
   actions=(
     'plan:preview a restow without changing HOME'
     'deploy:restow packages for this platform'
-    'sync:update the root repo and pinned submodules, then restow'
-    'bootstrap:prepare a new host'
+    'sync:update the root repo and pinned submodules, restow, then sync optional companion repos'
+    'bootstrap:prepare a new host, cloning missing optional companion repos'
     'shell-update:update packaged Antidote and declared plugin bundles'
     'status:show dotfiles worktree state'
   )
@@ -75,7 +76,8 @@ _dots() {
         '--platform=[target platform]:platform:(auto macos linux wsl)' \
         '--dry-run[show work without changing the host]' \
         '--skip-packages[do not install system dependencies]' \
-        '--skip-tmux-plugins[defer TPM plugin installation]'
+        '--skip-tmux-plugins[defer TPM plugin installation]' \
+        '--skip-optional-repos[do not clone optional companion repos]'
       ;;
     shell-update)
       _arguments -S \
