@@ -36,12 +36,12 @@ choose_vault() {
 
 usage() {
   cat <<EOF
-Usage: $(basename $0) [-af <file>] [-ae <ENV>]
+Usage: $(basename "$0") [-af <file>] [-ae <ENV>] [-h]
   -af <file>    Add a file‑based secret
   -ae <VAR>     Add an env‑var secret
+  -h, --help    Show this help
   (no flags)    Sync all secrets for this OS/host
 EOF
-  exit 1
 }
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -210,5 +210,6 @@ init
 case "${1:-}" in
   -af) shift; add_file "$1" ;;
   -ae) shift; add_env  "$1" ;;
+  -h|--help) usage ;;
    *)  sync_all      ;;
 esac

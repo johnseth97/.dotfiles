@@ -60,6 +60,7 @@ nothing and you get a bare shell with no error.
 | `20-completion` | compinit / bashcompinit |
 | `30-integrations` | ghostty, antidote, zoxide, sesh, starship |
 | `40-aliases`, `50-functions` | interactive conveniences, `dots` |
+| `55-completions` | `compdef` completions for `common/.bin` scripts |
 | `85-banner`, `90-tmux`, `99-toolchains` | startup banner, tmux autostart, SDKs |
 
 Add new config as a fragment; do not grow `.zshrc`. Guard anything that writes

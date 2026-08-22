@@ -1,6 +1,21 @@
 #!/bin/sh
 set -eu
 
+usage() {
+  cat <<'EOF'
+Usage: sync-dotfiles
+
+Fast-forward this checkout to origin/main, update pinned submodules, and
+restow. Refuses to run if the worktree has uncommitted changes.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help) usage; exit 0 ;;
+  '') ;;
+  *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+esac
+
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)
 

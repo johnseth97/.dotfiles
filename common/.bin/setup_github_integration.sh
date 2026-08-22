@@ -3,6 +3,18 @@
 # Script to set up GitHub integration: SSH keys, GPG signing, and Git user config
 # Author: johnseth97
 
+case "${1:-}" in
+  -h|--help)
+    cat <<'EOF'
+Usage: setup_github_integration.sh
+
+Interactively configure Git user info, an SSH key, and a GPG signing key,
+then walk through adding both to GitHub.
+EOF
+    exit 0
+    ;;
+esac
+
 GREEN='\033[1;32m'
 BLUE='\033[1;34m'
 RED='\033[1;31m'

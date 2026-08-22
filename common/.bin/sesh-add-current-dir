@@ -4,6 +4,19 @@
 
 set -eu
 
+case "${1:-}" in
+  -h|--help)
+    cat <<'EOF'
+Usage: sesh-add-current-dir
+
+Add the current working directory to zoxide (Sesh's project source) and
+refresh Sesh's cache. Intended to be invoked by tmux with the pane's
+directory as $PWD.
+EOF
+    exit 0
+    ;;
+esac
+
 notify() {
   if [ -n "${TMUX:-}" ] && command -v tmux >/dev/null 2>&1; then
     tmux display-message "$1"

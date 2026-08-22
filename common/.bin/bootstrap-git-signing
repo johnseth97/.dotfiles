@@ -1,6 +1,20 @@
 #!/bin/sh
 set -eu
 
+case "${1:-}" in
+  -h|--help)
+    cat <<'EOF'
+Usage: bootstrap-git-signing
+
+Configure Git commit signing through the platform's 1Password SSH-signing
+helper.
+EOF
+    exit 0
+    ;;
+  '') ;;
+  *) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
+esac
+
 case "$(uname -s)" in
   Darwin)
     signer='/Applications/1Password.app/Contents/MacOS/op-ssh-sign'
