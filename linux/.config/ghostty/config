@@ -1,0 +1,42 @@
+# Dynamic theme colors, kept in sync by `omarchy theme set`.
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+
+# Appearance
+font-family = BerkeleyMono Nerd Font Mono
+font-size = 12.0
+window-padding-x = 14
+window-padding-y = 14
+background-opacity = 0.75
+background-blur-radius = 20
+window-save-state = always
+quit-after-last-window-closed = true
+
+# Cursor
+cursor-style = "block"
+cursor-style-blink = false
+
+# Hyprland-specific fixes/behavior (Omarchy defaults)
+window-theme = ghostty
+resize-overlay = never
+confirm-close-surface = false
+gtk-toolbar-style = flat
+mouse-scroll-multiplier = 0.95
+# Fix general slowness on Hyprland: https://github.com/ghostty-org/ghostty/discussions/3224
+async-backend = epoll
+
+# Shell integration: sudo (our preference) plus Omarchy's cursor/ssh-env
+# fixes. Ghostty treats this as a full replacement list, not additive, so
+# all three must be listed together.
+shell-integration-features = sudo,no-cursor,ssh-env
+
+# Keybindings (Omarchy defaults)
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+# Send Shift+Enter as CSI-u so TUIs can distinguish it from Enter.
+keybind = shift+enter=csi:13;2u
+# Legacy encoding sends Alt+Shift+Enter the same as Alt+Enter; send CSI-u so tmux can match M-S-Enter.
+keybind = alt+shift+enter=csi:13;4u
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100

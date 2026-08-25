@@ -94,16 +94,43 @@ install_with_system_manager() {
       ;;
     linux|wsl)
       if command -v brew >/dev/null 2>&1; then
-        run brew install git stow zsh antidote tmux node zoxide
+        run brew install git stow zsh antidote tmux node zoxide eza
       elif command -v apt-get >/dev/null 2>&1; then
         run sudo apt-get update
         run sudo apt-get install -y git stow zsh tmux nodejs npm zoxide
         if apt-cache show zsh-antidote >/dev/null 2>&1; then run sudo apt-get install -y zsh-antidote; fi
+        if apt-cache show eza >/dev/null 2>&1; then run sudo apt-get install -y eza; fi
+        if apt-cache show sesh >/dev/null 2>&1; then run sudo apt-get install -y sesh; fi
       elif command -v dnf >/dev/null 2>&1; then
         run sudo dnf install -y git stow zsh tmux nodejs npm zoxide
         if dnf info antidote >/dev/null 2>&1; then run sudo dnf install -y antidote; fi
+        if dnf info eza >/dev/null 2>&1; then run sudo dnf install -y eza; fi
+        if dnf info sesh >/dev/null 2>&1; then run sudo dnf install -y sesh; fi
       elif command -v pacman >/dev/null 2>&1; then
-        run sudo pacman -S --needed --noconfirm git stow zsh tmux antidote nodejs npm zoxide
+        run sudo pacman -S --needed --noconfirm git stow zsh tmux nodejs npm zoxide eza
+        # antidote isn't in the official repos; the zsh plugin manager lives
+        # in the AUR as zsh-antidote (a same-named "antidote" AUR package
+        # exists but is unrelated proprietary software). Needs an AUR helper.
+        if pacman -Si zsh-antidote >/dev/null 2>&1; then
+          run sudo pacman -S --needed --noconfirm zsh-antidote
+        elif command -v yay >/dev/null 2>&1; then
+          run yay -S --needed --noconfirm zsh-antidote
+        elif command -v paru >/dev/null 2>&1; then
+          run paru -S --needed --noconfirm zsh-antidote
+        else
+          printf '%s\n' 'zsh-antidote not available; install an AUR helper (yay/paru) or install it manually.' >&2
+        fi
+        # sesh (tmux session manager) isn't in the official repos either;
+        # it's AUR-only as sesh-bin.
+        if pacman -Si sesh >/dev/null 2>&1; then
+          run sudo pacman -S --needed --noconfirm sesh
+        elif command -v yay >/dev/null 2>&1; then
+          run yay -S --needed --noconfirm sesh-bin
+        elif command -v paru >/dev/null 2>&1; then
+          run paru -S --needed --noconfirm sesh-bin
+        else
+          printf '%s\n' 'sesh not available; install an AUR helper (yay/paru) or install it manually.' >&2
+        fi
       else
         printf '%s\n' 'No supported package manager found (Homebrew, apt, dnf, or pacman).' >&2
         exit 1

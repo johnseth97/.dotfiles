@@ -1,8 +1,20 @@
 # Interactive convenience aliases. Portable automation should call .bin tools
 # directly rather than rely on aliases.
 
-alias ll='ls -alGh'
-alias la='ls -lah'
+# File listing. Mirrors Omarchy's default eza aliases so the same muscle
+# memory works both here and at the OS level; falls back to plain ls on
+# hosts without eza.
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza -lh --group-directories-first --icons=auto'
+  alias ll='eza -lh --group-directories-first --icons=auto'
+  alias la='eza -lah --group-directories-first --icons=auto'
+  alias lsa='ls -a'
+  alias lt='eza --tree --level=2 --long --icons --git'
+  alias lta='lt -a'
+else
+  alias ll='ls -alGh'
+  alias la='ls -lah'
+fi
 alias vim=nvim
 alias lg=lazygit
 alias zshedit='nvim ~/.zshrc'
