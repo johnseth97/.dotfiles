@@ -5,17 +5,18 @@ setup_wsl_windows_folder_links() {
   local windows_home windows_path onedrive_root link_path target_path current_target
   local -a candidates
 
-  windows_home="${WINHOME:-$(cmd.exe /D /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r' | wslpath -u 2>/dev/null)}"
-  windows_path=$(cmd.exe /D /C 'echo %OneDriveCommercial%' 2>/dev/null | tr -d '\r')
+  windows_home="${WINHOME:-$(wslpath -u "$(cmd.exe /D /C 'echo %USERPROFILE%' </dev/null 2>/dev/null | tr -d '\r')" 2>/dev/null)}"
+  [[ "$windows_home" == /* ]] || windows_home=
+  windows_path=$(cmd.exe /D /C 'echo %OneDriveCommercial%' </dev/null 2>/dev/null | tr -d '\r')
   if [[ -n "$windows_path" && "$windows_path" != '%OneDriveCommercial%' ]]; then
-    onedrive_root=$(printf '%s' "$windows_path" | wslpath -u 2>/dev/null)
+    onedrive_root=$(wslpath -u "$windows_path" 2>/dev/null)
   fi
 
   if [[ ! -d "$onedrive_root" ]] && (( $+commands[powershell.exe] )); then
     windows_path=$(powershell.exe -NoLogo -NoProfile -NonInteractive -Command \
       '$folders = @(Get-ItemProperty "HKCU:\Software\Microsoft\OneDrive\Accounts\Business*" -Name UserFolder -ErrorAction SilentlyContinue | ForEach-Object UserFolder); if ($folders.Count -eq 1) { $folders[0] }' \
-      2>/dev/null | tr -d '\r')
-    [[ -n "$windows_path" ]] && onedrive_root=$(printf '%s' "$windows_path" | wslpath -u 2>/dev/null)
+      </dev/null 2>/dev/null | tr -d '\r')
+    [[ -n "$windows_path" ]] && onedrive_root=$(wslpath -u "$windows_path" 2>/dev/null)
   fi
 
   if [[ ! -d "$onedrive_root" && -d "$windows_home" ]]; then

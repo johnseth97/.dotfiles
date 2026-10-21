@@ -21,14 +21,9 @@ export COLORTERM="truecolor"
 
 export PATH="$PATH:/opt/mssql-tools18/bin"
 
-# 1Password session setup. Persistent Git configuration is handled explicitly
-# by ~/.bin/bootstrap-git-signing, not during every interactive shell startup.
-windows_home="${WINHOME:-$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r' | wslpath -u 2>/dev/null)}"
-if [ -n "$windows_home" ] && [ -f "$windows_home/AppData/Local/1Password/app/8/op-ssh-sign-wsl" ]; then
-  export GIT_SSH_COMMAND="ssh.exe"
-else
-  [[ $- == *i* && -t 1 ]] && echo "[1Password] Skipping session setup - op-ssh-sign-wsl not found."
-fi
+# Git's SSH client (core.sshCommand) and 1Password signing (gpg.ssh.program,
+# via ~/.bin/bootstrap-git-signing) are persistent Git configuration, not set
+# during every interactive shell startup.
 
 # Optional host-folder integration is owned by the WSL Stow package.
 [[ -r "$HOME/.config/zsh/sync-windows-folders.zsh" ]] && source "$HOME/.config/zsh/sync-windows-folders.zsh"

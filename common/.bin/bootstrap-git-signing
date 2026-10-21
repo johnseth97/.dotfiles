@@ -21,7 +21,7 @@ case "$(uname -s)" in
     ;;
   Linux)
     if grep -qi microsoft /proc/version 2>/dev/null; then
-      windows_home=${WINHOME:-$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r' | wslpath -u)}
+      windows_home=${WINHOME:-$(wslpath -u "$(cmd.exe /C 'echo %USERPROFILE%' </dev/null 2>/dev/null | tr -d '\r')")}
       signer="$windows_home/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
     else
       signer='/opt/1Password/op-ssh-sign'
