@@ -1,6 +1,9 @@
 #!/bin/zsh
 # Linux-Specific ZSH Configuration
 
+# Disable the stupid fucking bell
+unsetopt BEEP
+
 [[ $- == *i* && -t 1 ]] && echo "🔹 Loading Linux config..."
 
 # Set 1Password SSH Agent if available
