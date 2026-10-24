@@ -55,6 +55,16 @@ command -v stow >/dev/null 2>&1 || {
   exit 1
 }
 
+# Git does not preserve directory modes. The shell points 1Password at this
+# real directory because the CLI rejects Stow-folded symlink config paths.
+if [ -d "$repo_dir/common/.config/op" ]; then
+  if [ "$dry_run" -eq 1 ]; then
+    printf '%s\n' 'Would secure the 1Password config directory (mode 700).'
+  else
+    chmod 700 "$repo_dir/common/.config/op"
+  fi
+fi
+
 packages=common
 [ -d "$repo_dir/$platform" ] && packages="$packages $platform"
 

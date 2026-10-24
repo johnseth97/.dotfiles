@@ -1,0 +1,32 @@
+#!/bin/sh
+# Use the deployed Neovim configuration, independent of this checkout's path.
+set -eu
+case "${1:-}" in
+  -h|--help)
+    printf '%s\n' 'Usage: mail [ACCOUNT] | mail open [ACCOUNT]' \
+      '       mail add-account | list-accounts | edit-accounts' \
+      '       mail delete-account ACCOUNT | check-account ACCOUNT | login ACCOUNT' \
+      'Account setup uses Himalaya configure; deletion removes only local configuration.'
+    exit 0 ;;
+  add-account|delete-account|list-accounts|check-account|edit-accounts|login)
+    # Locate the deployed sibling without assuming this script is not symlinked.
+    if command -v nvim-mail-account >/dev/null 2>&1; then
+      exec nvim-mail-account "$@"
+    fi
+    script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+    exec "$script_dir/nvim-mail-account" "$@" ;;
+  open) shift ;;
+esac
+[ "$#" -le 1 ] || { printf '%s\n' 'Usage: nvim-mail [ACCOUNT]' >&2; exit 2; }
+command -v nvim >/dev/null 2>&1 || { printf '%s\n' 'Neovim is missing; run dotfiles bootstrap.' >&2; exit 1; }
+# Avoid inheriting an unrelated editor profile or leaking mode into child editors.
+unset NVIM_APPNAME
+export DOTFILES_MAIL=1
+export DOTFILES_MAIL_ACCOUNT="${1:-}"
+if command -v nvim-mail-session >/dev/null 2>&1; then
+  mail_session=nvim-mail-session
+else
+  script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+  mail_session="$script_dir/nvim-mail-session"
+fi
+exec "$mail_session" nvim '+lua local ok, mail = pcall(require, "custom.mail"); if ok then mail.start() else vim.notify("Mail configuration is missing. Deploy this dotfiles checkout with dotfiles-stow --restow.", vim.log.levels.ERROR) end'

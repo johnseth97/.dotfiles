@@ -1,0 +1,57 @@
+# Resolve exact Omarchy colours once per theme/config change, not per module.
+# Keep the portable Starship config untouched and render through a cache.
+_dotfiles_starship_palette() {
+  local base="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+  local theme="$HOME/.local/state/omarchy/current/theme/colors.toml"
+  local target="${XDG_CACHE_HOME:-$HOME/.cache}/starship/omarchy.toml"
+  [[ -r $base && -r $theme ]] || return 0
+  (( $+commands[python3] )) || return 0
+  # Respect an explicitly selected alternate Starship configuration.
+  [[ -z ${STARSHIP_CONFIG:-} || $STARSHIP_CONFIG == $target || $STARSHIP_CONFIG == $base ]] || return 0
+  zmodload -F zsh/stat b:zstat
+  local -A base_stat theme_stat
+  zstat -H base_stat "$base" 2>/dev/null || return 0
+  zstat -H theme_stat "$theme" 2>/dev/null || return 0
+  local stamp="${base_stat[inode]}:${base_stat[mtime]}:${base_stat[size]}:${theme_stat[inode]}:${theme_stat[mtime]}:${theme_stat[size]}"
+  if [[ $stamp != ${_dotfiles_starship_palette_stamp:-} || ! -f $target ]]; then
+    python3 - "$base" "$theme" "$target" <<'PY'
+import os
+from pathlib import Path
+import re
+import sys
+import tempfile
+import tomllib
+
+base, theme, target = map(Path, sys.argv[1:])
+try:
+    source = base.read_text()
+    config = tomllib.loads(source)
+    colors = tomllib.loads(theme.read_text())
+    palette = config['palettes']['omarchy'].copy()
+    for key in palette:
+        value = colors.get(key, palette[key])
+        if not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value):
+            raise ValueError('Invalid theme colour: ' + key)
+        palette[key] = value
+    # The fallback palette is deliberately the final table in the source.
+    source = source.split('[palettes.omarchy]', 1)[0]
+    source += '[palettes.omarchy]\n' + ''.join(
+        f'{key} = "{value}"\n' for key, value in palette.items())
+    tomllib.loads(source)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode='w', dir=target.parent, delete=False) as output:
+        output.write(source)
+    os.replace(output.name, target)
+except (OSError, ValueError, KeyError) as error:
+    print(f'[starship palette] {error}', file=sys.stderr)
+    sys.exit(1)
+PY
+    (( $? == 0 )) || return 0
+    typeset -g _dotfiles_starship_palette_stamp=$stamp
+  fi
+  export STARSHIP_CONFIG="$target"
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _dotfiles_starship_palette
+_dotfiles_starship_palette

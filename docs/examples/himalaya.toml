@@ -1,0 +1,58 @@
+# SANITIZED EXAMPLE ONLY. Copy to a PRIVATE config path outside this checkout.
+# Himalaya 2.2.1: do not mix with v1 backend.type / imap.host examples.
+# Keep just the accounts you use; replace every placeholder locally.
+[accounts.icloud]
+default = true
+email = "you@icloud.com"
+display-name = "Your Name"
+imap.server = "imaps://imap.mail.me.com:993"
+imap.sasl.plain.username = "you@icloud.com"
+imap.sasl.plain.password.command = ["op", "read", "op://Mail/iCloud/app-password"]
+smtp.server = "smtp://smtp.mail.me.com:587"
+smtp.starttls = true
+smtp.sasl.plain.username = "you@icloud.com"
+smtp.sasl.plain.password.command = ["op", "read", "op://Mail/iCloud/app-password"]
+mailbox.alias.inbox = "INBOX"
+mailbox.alias.drafts = "Drafts"
+mailbox.alias.sent = "Sent Messages"
+mailbox.alias.archive = "Archive"
+mailbox.alias.trash = "Deleted Messages"
+message.send.save-copy = "sent"
+
+[accounts.outlook]
+email = "you@example.com"
+display-name = "Your Name"
+msgraph.user-id = "me"
+msgraph.auth.token.command = ["nvim-mail-token", "outlook"]
+# Graph files sent mail itself. Do not enable message.send.save-copy here.
+# Roles are discovered by the backend; verify mailbox list before overriding.
+
+[accounts.gmail]
+email = "you@gmail.com"
+imap.server = "imaps://imap.gmail.com:993"
+imap.sasl.plain.username = "you@gmail.com"
+imap.sasl.plain.password.command = ["op", "read", "op://Mail/Gmail/app-password"]
+smtp.server = "smtps://smtp.gmail.com:465"
+smtp.sasl.plain.username = "you@gmail.com"
+smtp.sasl.plain.password.command = ["op", "read", "op://Mail/Gmail/app-password"]
+mailbox.alias.inbox = "INBOX"
+mailbox.alias.drafts = "[Gmail]/Drafts"
+mailbox.alias.sent = "[Gmail]/Sent Mail"
+mailbox.alias.archive = "[Gmail]/All Mail"
+mailbox.alias.trash = "[Gmail]/Trash"
+# Gmail files sent messages itself; leave save-copy unset.
+
+[accounts.yahoo]
+email = "you@yahoo.com"
+imap.server = "imaps://imap.mail.yahoo.com:993"
+imap.sasl.plain.username = "you@yahoo.com"
+imap.sasl.plain.password.command = ["op", "read", "op://Mail/Yahoo/app-password"]
+smtp.server = "smtps://smtp.mail.yahoo.com:465"
+smtp.sasl.plain.username = "you@yahoo.com"
+smtp.sasl.plain.password.command = ["op", "read", "op://Mail/Yahoo/app-password"]
+mailbox.alias.inbox = "INBOX"
+mailbox.alias.drafts = "Draft"
+mailbox.alias.sent = "Sent"
+mailbox.alias.archive = "Archive"
+mailbox.alias.trash = "Trash"
+message.send.save-copy = "sent"

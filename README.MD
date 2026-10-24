@@ -181,3 +181,10 @@ test -d "$test_home/.config/tmux/plugins/tpm"
 ```
 
 Inspect `"$test_home"` when finished, then remove it explicitly if desired.
+
+### Mail in Neovim
+
+`mail [ACCOUNT]` launches a dedicated mode in the shared Neovim configuration
+using Himalaya v2 and `knownasnaffy/himalaya.nvim`. See
+[mail setup and controls](docs/mail.md) for deployment, private account examples,
+iCloud app passwords, Microsoft Graph OAuth and Gmail/Yahoo onboarding.

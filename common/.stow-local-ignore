@@ -42,3 +42,6 @@ _darcs
 # TPM itself is a pinned submodule.  Its installed plugins are mutable runtime
 # checkouts owned by TPM, rather than files owned by this Stow package.
 ^/\.config/tmux/plugins/(?!tpm(?:/|$)).*
+
+# Never fold private mail accounts/token caches into the deployed config.
+^/\.config/himalaya(?:/|$)

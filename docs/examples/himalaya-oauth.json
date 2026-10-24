@@ -1,0 +1,11 @@
+{
+  "outlook": {
+    "client_id": "REPLACE-WITH-APP-CLIENT-ID",
+    "tenant_id": "REPLACE-WITH-TENANT-ID-OR-common",
+    "scopes": [
+      "https://graph.microsoft.com/Mail.ReadWrite",
+      "https://graph.microsoft.com/Mail.Send",
+      "offline_access"
+    ]
+  }
+}

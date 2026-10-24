@@ -162,6 +162,8 @@ brew "neofetch"
 brew "tree-sitter"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# Neovim mail mode requires the v2 CLI
+brew "himalaya"
 # Small build system for use with gyp or CMake
 brew "ninja"
 # Free/open-source library for nonlinear optimization

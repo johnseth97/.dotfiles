@@ -3,14 +3,30 @@
 
 # Inserts a blank line between shell prompts
 add_newline = true
+palette = "omarchy"
 
 # Increase command timeout for connections to remote folders
 command_timeout = 500
 
 
 # Prompt format
-format = """╭─ $all\n╰─$character """
+format = """╭─$all\n╰─$character """
 right_format = """$cmd_duration$time$status"""
+
+# Capsule colours are resolved from Omarchy by 35-prompt-palette.zsh.
+# The palette below is the portable Tokyo Night fallback.
+[directory]
+format = '[](blue)[ $path$read_only ]($style)[](blue)'
+style = 'bold fg:background bg:blue'
+read_only_style = 'fg:background bg:blue'
+
+[git_branch]
+format = '─[](magenta)[ $symbol$branch(:$remote_branch) ]($style)[](magenta)'
+style = 'bold fg:background bg:magenta'
+
+[git_status]
+format = '(─[](yellow)[ $all_status$ahead_behind ]($style)[](yellow))'
+style = 'fg:background bg:yellow'
 
 [character]
 format = "$symbol "
@@ -22,8 +38,12 @@ disabled = true
 
 [time]
 disabled = false
+format = '[](cyan)[ $time ]($style)[](cyan) '
+style = 'fg:background bg:cyan'
 
 [cmd_duration]
+format = '[](yellow)[ $duration ]($style)[](yellow) '
+style = 'fg:background bg:yellow'
 disabled = false
 min_time = 0
 show_notifications = true
@@ -41,3 +61,13 @@ disabled = true
 [sudo]
 disabled = false
 symbol = '👨🏼‍💻 '
+
+# Keep this palette last: the generated cache replaces it with Omarchy colours.
+[palettes.omarchy]
+background = '#3b4261'
+blue = '#7aa2f7'
+magenta = '#9d7cd8'
+yellow = '#e0af68'
+cyan = '#4fd6be'
+green = '#9ece6a'
+red = '#f7768e'

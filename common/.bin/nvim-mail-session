@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""Resolve static 1Password mail passwords once with native `op run`.
+
+Only secret references and a command overlay reach temporary files. Resolved
+passwords live in the mail process environment until it exits.
+"""
+import json
+import os
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+try:
+    import tomllib
+except ImportError:
+    sys.exit('Mail session setup requires Python 3.11 or newer.')
+
+
+def config_paths():
+    explicit = os.environ.get('HIMALAYA_CONFIG')
+    if explicit:
+        return [Path(os.path.expandvars(path)).expanduser().resolve() for path in explicit.split(':')]
+    home = Path.home()
+    for path in [Path(os.environ.get('XDG_CONFIG_HOME', home / '.config')) / 'himalaya/config.toml',
+                 home / '.config/himalaya/config.toml', home / '.himalayarc']:
+        if path.is_file():
+            return [path.resolve()]
+    return []
+
+
+def merge(base, extra):
+    for key, value in extra.items():
+        if isinstance(value, dict) and isinstance(base.get(key), dict):
+            merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+def op_reference(command):
+    try:
+        argv = shlex.split(command) if isinstance(command, str) else command
+    except ValueError:
+        return None
+    if not isinstance(argv, list) or not all(isinstance(value, str) for value in argv):
+        return None
+    if len(argv) < 3 or argv[:2] != ['op', 'read']:
+        return None
+    rest = [value for value in argv[2:] if value in ('--no-newline', '-n') or not value.startswith('-')]
+    refs = [value for value in rest if value not in ('--no-newline', '-n')]
+    if len(rest) != len(argv) - 2 or len(refs) != 1:
+        return None
+    ref = refs[0]
+    # Preserve custom shell logic, OTP/query reads and dynamic references as-is.
+    if not ref.startswith('op://') or any(char in ref for char in ('$', '?', '\n', '\r', '\0', '`')):
+        return None
+    return ref
+
+
+def password_commands(data, path=()):
+    if not isinstance(data, dict):
+        return
+    if path and path[-1] in ('password', 'passwd') and 'command' in data:
+        ref = op_reference(data['command'])
+        if ref:
+            yield path, ref, isinstance(data['command'], str)
+    for key, value in data.items():
+        if isinstance(value, dict):
+            yield from password_commands(value, (*path, key))
+
+
+def prepare(data):
+    references, sections = {}, []
+    for path, ref, shell_command in password_commands(data.get('accounts', {}), ('accounts',)):
+        variable = references.setdefault(ref, 'DOTFILES_MAIL_PASSWORD_' + str(len(references)))
+        sections.extend([
+            '[' + '.'.join(json.dumps(key) for key in path) + ']',
+            'command = ' + json.dumps('printenv ' + variable if shell_command else ['printenv', variable]), '',
+        ])
+    dotenv = ''.join(f'{variable}={json.dumps(ref)}\n' for ref, variable in references.items())
+    return dotenv, '\n'.join(sections)
+
+
+def main(command=None):
+    command = command if command is not None else sys.argv[1:]
+    if not command:
+        print('Usage: nvim-mail-session COMMAND [ARG ...]', file=sys.stderr)
+        return 2
+    paths, data = config_paths(), {}
+    try:
+        for path in paths:
+            merge(data, tomllib.loads(path.read_text()))
+    except (OSError, UnicodeError, tomllib.TOMLDecodeError):
+        # Let Neovim show its configuration guidance without exposing file contents.
+        return subprocess.call(command)
+    dotenv, overlay = prepare(data)
+    if not dotenv:
+        return subprocess.call(command)
+    if not shutil.which('op'):
+        print('1Password CLI is missing; install it before opening these mail accounts.', file=sys.stderr)
+        return 1
+    os.umask(0o077)
+    with tempfile.TemporaryDirectory(prefix='nvim-mail-') as directory:
+        root = Path(directory)
+        env_file, config = root / 'references.env', root / 'session.toml'
+        env_file.write_text(dotenv)
+        config.write_text(overlay)
+        env_file.chmod(0o600)
+        config.chmod(0o600)
+        env = dict(os.environ, HIMALAYA_CONFIG=':'.join(str(path) for path in [*paths, config]))
+        print('Unlock 1Password for this mail session. Passwords are kept only in the process environment until exit.', file=sys.stderr)
+        # Masking wraps terminal output; bypass it for the interactive TUI. Mail
+        # never prints the passwords; printenv output is captured by Himalaya.
+        try:
+            return subprocess.call(['op', 'run', '--no-masking', '--env-file', str(env_file), '--', *command], env=env)
+        except KeyboardInterrupt:
+            return 130
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except OSError:
+        sys.exit('Could not start the mail session. Check installed tools and private file permissions.')

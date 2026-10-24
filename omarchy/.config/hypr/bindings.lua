@@ -55,3 +55,9 @@ o.bind("SUPER + SHIFT + M", "Music", "~/.config/hypr/scripts/focus-or-launch-cid
 
 -- caps -> ctrl
 -- o.bind("CAPS", "ctrl")
+
+-- Was "Toggle top bar" in bindings/utilities.lua. Match the 1Password Quick
+-- Access shortcut used on macOS; Wayland needs the compositor to bind it.
+o.rebind("SUPER + SHIFT + SPACE", "1Password Quick Access", {
+  launch = "1password --force-device-scale-factor=1 --quick-access",
+})

@@ -100,6 +100,24 @@ fi
 # Starship
 eval "$(starship init zsh)"
 
+# Collapse submitted commands to a single arrow; keep Starship's full prompt
+# for the next command. A line-finish hook preserves accept-line integrations
+# (including zsh-ai) and other ZLE hooks such as Ghostty's shell integration.
+_dotfiles_transient_prompt() {
+  [[ -o interactive && $CONTEXT == start && -n $BUFFER ]] || return 0
+  local PROMPT='%(?.%F{green}.%F{red})❯%f '
+  local RPROMPT=''
+  # Use the status captured by Starship, not the hook dispatcher’s status.
+  if (( ${STARSHIP_CMD_STATUS:-0} )); then
+    PROMPT='%F{red}❯%f '
+  else
+    PROMPT='%F{green}❯%f '
+  fi
+  zle reset-prompt
+}
+autoload -Uz add-zle-hook-widget
+add-zle-hook-widget line-finish _dotfiles_transient_prompt
+
 # zoxide
 eval "$(zoxide init zsh --cmd cd)"
 

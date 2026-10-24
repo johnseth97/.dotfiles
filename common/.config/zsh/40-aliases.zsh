@@ -15,6 +15,8 @@ else
   alias ll='ls -alGh'
   alias la='ls -lah'
 fi
+# Intentionally shadows a system mail utility; use `command mail` to bypass.
+alias mail='nvim-mail'
 alias vim=nvim
 alias lg=lazygit
 alias zshedit='nvim ~/.zshrc'

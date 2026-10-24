@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+"""Microsoft delegated Graph OAuth: explicit device login, silent token refresh.
+
+Private client/tenant settings: $XDG_CONFIG_HOME/himalaya/oauth.json.
+Tokens: $XDG_STATE_HOME/himalaya (never in the Stow package).
+"""
+import argparse
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+
+def request(url, fields):
+    data = urllib.parse.urlencode(fields).encode()
+    try:
+        with urllib.request.urlopen(url, data=data, timeout=30) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        # Never print the response: it may contain identity or token material.
+        try:
+            return json.load(error)
+        except ValueError:
+            raise RuntimeError('OAuth endpoint rejected the request.') from None
+
+
+def token(args):
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', args.account):
+        raise RuntimeError('Use a simple account name containing letters, numbers, _ or -.')
+    home = Path.home()
+    config = Path(os.environ.get('XDG_CONFIG_HOME', home / '.config')) / 'himalaya/oauth.json'
+    try:
+        settings = json.loads(config.read_text())[args.account]
+    except (OSError, ValueError, KeyError):
+        raise RuntimeError('Configure private himalaya/oauth.json first; see dotfiles docs/mail.md.') from None
+    tenant = settings.get('tenant_id', 'common')
+    client = settings.get('client_id', '')
+    if not re.fullmatch(r'[A-Za-z0-9.-]+', tenant) or not re.fullmatch(r'[A-Fa-f0-9-]{36}', client):
+        raise RuntimeError('Set the approved Entra application client_id and tenant_id.')
+    scope = ' '.join(settings.get('scopes', [
+        'https://graph.microsoft.com/Mail.ReadWrite',
+        'https://graph.microsoft.com/Mail.Send', 'offline_access',
+    ]))
+    endpoint = 'https://login.microsoftonline.com/' + tenant + '/oauth2/v2.0/'
+    cache_dir = Path(os.environ.get('XDG_STATE_HOME', home / '.local/state')) / 'himalaya'
+    cache_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    cache_dir.chmod(0o700)
+    cache_path = cache_dir / ('oauth-' + args.account + '.json')
+    # Serialise concurrent sidebar/message token requests, including refresh rotation.
+    with (cache_dir / ('oauth-' + args.account + '.lock')).open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            cached = json.loads(cache_path.read_text())
+        except (OSError, ValueError):
+            cached = {}
+        if cached.get('client_id') != client or cached.get('tenant_id') != tenant or cached.get('scope_request') != scope:
+            cached = {}
+        if not args.login and cached.get('expires_at', 0) > time.time() + 120:
+            return cached['access_token']
+        result = {}
+        if not args.login and cached.get('refresh_token'):
+            result = request(endpoint + 'token', {
+                'client_id': client, 'grant_type': 'refresh_token',
+                'refresh_token': cached['refresh_token'], 'scope': scope,
+            })
+        if args.login:
+            flow = request(endpoint + 'devicecode', {'client_id': client, 'scope': scope})
+            if 'device_code' not in flow:
+                raise RuntimeError('Device login refused. Check public-client flow, consent and tenant policy.')
+            print(flow['message'], file=sys.stderr)
+            deadline = time.monotonic() + flow.get('expires_in', 900)
+            interval = flow.get('interval', 5)
+            while time.monotonic() < deadline:
+                time.sleep(interval)
+                result = request(endpoint + 'token', {
+                    'client_id': client,
+                    'grant_type': 'urn:ietf:params:oauth:grant-type:device_code',
+                    'device_code': flow['device_code'],
+                })
+                error = result.get('error')
+                if error == 'slow_down':
+                    interval += 5
+                elif error != 'authorization_pending':
+                    break
+        if 'access_token' not in result:
+            raise RuntimeError('OAuth sign-in required or refused. Run nvim-mail-token ACCOUNT --login in a terminal; check tenant policy/consent.')
+        result['expires_at'] = time.time() + result.get('expires_in', 3600)
+        result['client_id'], result['tenant_id'], result['scope_request'] = client, tenant, scope
+        if 'refresh_token' not in result and cached.get('refresh_token'):
+            result['refresh_token'] = cached['refresh_token']
+        temporary = cache_path.with_suffix('.tmp')
+        with temporary.open('w') as output:
+            json.dump(result, output)
+        temporary.chmod(0o600)
+        temporary.replace(cache_path)
+        return result['access_token']
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('account')
+    parser.add_argument('--login', action='store_true', help='explicit interactive device login; never print a token')
+    args = parser.parse_args()
+    os.umask(0o077)
+    try:
+        value = token(args)
+    except (RuntimeError, OSError, KeyError, ValueError) as error:
+        # Network exceptions can include URLs; keep diagnostics generic.
+        print(str(error) if isinstance(error, RuntimeError) else 'OAuth helper failed; check private configuration and network access.', file=sys.stderr)
+        return 1
+    if args.login:
+        print('OAuth cache ready.', file=sys.stderr)
+    else:
+        print(value)
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

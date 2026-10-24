@@ -24,6 +24,7 @@ package-lock.json
 yarn.lock
 
 # Build Artifacts
+__pycache__/
 *.o
 *.out
 *.class
@@ -100,3 +101,6 @@ testing/**/*
 # file on disk for lazysql, but never track it. See
 # ~/.agent-info/security/sql-credential-exposure-remediation.md
 /common/.config/lazysql/config.toml
+
+# Mail account identities, OAuth credentials and mailbox state remain local.
+/common/.config/himalaya/

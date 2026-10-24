@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""Local account management around Himalaya's native configuration wizard."""
+import argparse
+from copy import deepcopy
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+
+try:
+    import tomllib
+except ImportError:
+    sys.exit('Mail account management requires Python 3.11 or newer.')
+
+
+def private_path(path):
+    """Refuse writes through Stow links or to any Git checkout."""
+    path = path.expanduser().resolve()
+    parent = path.parent
+    while not parent.exists():
+        parent = parent.parent
+    result = subprocess.run(['git', '-C', str(parent), 'rev-parse', '--is-inside-work-tree'],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if result.returncode == 0:
+        raise ValueError('Refusing to write mail settings inside a Git checkout. Select a private HIMALAYA_CONFIG path.')
+    return path
+
+
+def config_path():
+    explicit = os.environ.get('HIMALAYA_CONFIG')
+    if explicit:
+        if ':' in explicit:
+            raise ValueError('Account edits require one config file. Set HIMALAYA_CONFIG to the private file you want to edit, without colon-separated overlays.')
+        return private_path(Path(os.path.expandvars(explicit)))
+    home = Path.home()
+    candidates = [Path(os.environ.get('XDG_CONFIG_HOME', home / '.config')) / 'himalaya/config.toml',
+                  home / '.config/himalaya/config.toml', home / '.himalayarc']
+    return private_path(next((path for path in candidates if path.exists()), candidates[0]))
+
+
+def read_config(path):
+    try:
+        text = path.read_text()
+        data = tomllib.loads(text)
+    except FileNotFoundError:
+        raise ValueError('No account config yet. Run mail add-account first.') from None
+    except (UnicodeError, tomllib.TOMLDecodeError):
+        raise ValueError('Invalid account TOML. Run mail edit-accounts to repair it.') from None
+    accounts = data.get('accounts', {})
+    if not isinstance(accounts, dict) or any(not isinstance(account, dict) for account in accounts.values()):
+        raise ValueError('Unsupported account structure. Run mail edit-accounts to repair it.')
+    return text, data
+
+
+def backup(path):
+    if not path.exists():
+        return
+    with tempfile.NamedTemporaryFile(prefix=path.name + '.backup-', dir=path.parent, delete=False) as target:
+        target.write(path.read_bytes())
+        os.fchmod(target.fileno(), 0o600)
+    print('Private config backup created beside the config file.', file=sys.stderr)
+
+
+def write_private(path, content):
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with tempfile.NamedTemporaryFile(mode='w', prefix='.' + path.name + '-', dir=path.parent, delete=False) as output:
+        temporary = Path(output.name)
+        try:
+            os.fchmod(output.fileno(), 0o600)
+            output.write(content)
+            output.flush()
+            os.fsync(output.fileno())
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
+    temporary.replace(path)
+
+
+def table_account(header):
+    """Ask the TOML parser which account a table belongs to, without parsing TOML ourselves."""
+    try:
+        document = tomllib.loads(header + '\n')
+    except tomllib.TOMLDecodeError:
+        return None
+    accounts = document.get('accounts')
+    if isinstance(accounts, dict) and len(accounts) == 1:
+        return next(iter(accounts))
+    return None
+
+
+def remove_account(text, name):
+    """Remove conventional table blocks, then prove all other parsed data survived.
+
+    Unusual inline/dotted layouts and ambiguous multiline strings are refused,
+    leaving manual editing available rather than reserializing the whole file.
+    """
+    original = tomllib.loads(text)
+    accounts = original.get('accounts', {})
+    if name not in accounts:
+        raise ValueError('Account not found. Run mail list-accounts.')
+    expected = deepcopy(original)
+    del expected['accounts'][name]
+    lines = text.splitlines(keepends=True)
+    headings = [(i, table_account(line.strip())) for i, line in enumerate(lines)
+                if re.match(r'^\s*\[.*\]\s*(?:#.*)?$', line)]
+    removed = set()
+    for position, (start, account) in enumerate(headings):
+        if account != name:
+            continue
+        end = headings[position + 1][0] if position + 1 < len(headings) else len(lines)
+        # Leave trailing comments/spacing for the following section intact.
+        while end > start + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith('#')):
+            end -= 1
+        removed.update(range(start, end))
+    candidate = ''.join(line for i, line in enumerate(lines) if i not in removed)
+    try:
+        parsed = tomllib.loads(candidate)
+    except tomllib.TOMLDecodeError:
+        raise ValueError('This TOML layout needs manual editing; no changes made. Run mail edit-accounts.') from None
+    # An implicit accounts container disappears when its last table is removed.
+    if not expected.get('accounts') and 'accounts' not in parsed:
+        expected.pop('accounts', None)
+    if not removed or parsed != expected:
+        raise ValueError('Cannot remove this account while preserving all other settings. No changes made; run mail edit-accounts.')
+    return candidate
+
+
+def native(*args):
+    if not shutil.which('himalaya'):
+        raise ValueError('Himalaya is missing. Install it through dotfiles bootstrap/package management.')
+    return subprocess.call(['himalaya', *args])
+
+
+def login(name):
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', name):
+        raise ValueError('OAuth helper names may contain letters, numbers, _ and - only.')
+    path = private_path(Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'himalaya/oauth.json')
+    try:
+        settings = json.loads(path.read_text())
+        if not isinstance(settings, dict):
+            raise ValueError()
+    except FileNotFoundError:
+        settings = {}
+    except (ValueError, UnicodeError):
+        raise ValueError('Repair the private himalaya/oauth.json before logging in.') from None
+    if name not in settings:
+        print('Microsoft login needs an approved public-client Entra application (see docs/mail.md).', file=sys.stderr)
+        client = input('Application (client) UUID: ').strip()
+        tenant = input('Tenant UUID or common [common]: ').strip() or 'common'
+        if not re.fullmatch(r'[A-Fa-f0-9-]{36}', client) or not re.fullmatch(r'[A-Za-z0-9.-]+', tenant):
+            raise ValueError('Invalid application/tenant identifier; no settings changed.')
+        settings[name] = {'client_id': client, 'tenant_id': tenant}
+        backup(path)
+        write_private(path, json.dumps(settings, indent=2) + '\n')
+    # Resolve the sibling through PATH so the checkout can live anywhere.
+    helper = shutil.which('nvim-mail-token') or str(Path(__file__).resolve().with_name('nvim-mail-token'))
+    return subprocess.call([helper, name, '--login'])
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=['add-account', 'delete-account', 'list-accounts',
+                                          'check-account', 'edit-accounts', 'login'])
+    parser.add_argument('account', nargs='?')
+    args = parser.parse_args(argv)
+    needs_name = args.action in ('delete-account', 'check-account', 'login')
+    if needs_name != bool(args.account):
+        parser.error('this action requires ACCOUNT' if needs_name else 'this action takes no account argument')
+    os.umask(0o077)
+    try:
+        if args.action == 'list-accounts':
+            return native('account', 'list')
+        if args.action == 'check-account':
+            return native('--account', args.account, 'account', 'check')
+        if not sys.stdin.isatty() or not sys.stdout.isatty():
+            raise ValueError('This action needs an interactive terminal; no settings changed.')
+        if args.action == 'login':
+            return login(args.account)
+        path = config_path()
+        if args.action == 'add-account':
+            if path.exists():
+                read_config(path)  # Refuse an invalid existing config before the wizard starts.
+                path.chmod(0o600)
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            backup(path)
+            print('Opening Himalaya\'s wizard. Choose 1Password or a secret/token command; avoid raw passwords.', file=sys.stderr)
+            print('For Microsoft Graph with our helper, run mail login NAME first, then use nvim-mail-token NAME as the token command.', file=sys.stderr)
+            return native('--config', str(path), 'configure')
+        if args.action == 'edit-accounts':
+            backup(path)
+            path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            editor = shlex.split(os.environ.get('VISUAL') or os.environ.get('EDITOR') or 'nvim')
+            result = subprocess.call([*editor, str(path)])
+            if path.exists():
+                path.chmod(0o600)
+                read_config(path)
+            return result
+        text, data = read_config(path)
+        candidate = remove_account(text, args.account)
+        remaining = data.get('accounts', {}).copy()
+        was_default = remaining.pop(args.account).get('default', False)
+        print('Removes only the local account configuration. Server mail, 1Password entries and OAuth credentials remain.', file=sys.stderr)
+        if input('Type the account name to confirm removal: ') != args.account:
+            print('Cancelled.', file=sys.stderr)
+            return 0
+        if path.read_text() != text:
+            raise ValueError('Configuration changed during confirmation. Rerun delete-account; no changes made.')
+        backup(path)
+        write_private(path, candidate)
+        print('Local account removed.', file=sys.stderr)
+        if was_default and remaining:
+            print('The removed account was default. Use mail edit-accounts to choose a new default, or launch mail ACCOUNT.', file=sys.stderr)
+        return 0
+    except (ValueError, OSError, EOFError) as error:
+        # Do not echo parser exceptions or file contents that could contain credentials.
+        message = str(error) if isinstance(error, ValueError) else 'Account operation failed or was cancelled. Check private file permissions and installed tools.'
+        print(message, file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
