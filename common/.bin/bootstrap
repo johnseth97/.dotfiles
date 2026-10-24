@@ -97,7 +97,8 @@ install_with_system_manager() {
         run brew install git stow zsh antidote tmux node zoxide eza neovim himalaya python
       elif command -v apt-get >/dev/null 2>&1; then
         run sudo apt-get update
-        run sudo apt-get install -y git stow zsh tmux nodejs npm zoxide neovim python3
+        # apt's neovim lags this config's minimum; install it separately.
+        run sudo apt-get install -y git stow zsh tmux nodejs npm zoxide python3
         if apt-cache show zsh-antidote >/dev/null 2>&1; then run sudo apt-get install -y zsh-antidote; fi
         if apt-cache show himalaya >/dev/null 2>&1; then run sudo apt-get install -y himalaya; fi
         if apt-cache show eza >/dev/null 2>&1; then run sudo apt-get install -y eza; fi

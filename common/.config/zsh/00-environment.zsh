@@ -16,8 +16,11 @@ export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 # 1Password CLI refuses to run when its config dir is itself a symlink
 # (~/.config/op is Stow-folded into the dotfiles repo). Point it at the
 # real path directly instead of the symlinked default.
-# Resolve the deployed config instead of assuming a checkout location.
-export OP_CONFIG_DIR="${${DOTFILES_ZSH_DIR:A}:h}/op"
+# Resolve the deployed op dir itself, not its parent: ~/.config/zsh is a real
+# directory when a host package (wsl) also contributes to it, so only the
+# final component reliably resolves through Stow's fold.
+export OP_CONFIG_DIR="${DOTFILES_ZSH_DIR:h}/op"
+OP_CONFIG_DIR=${OP_CONFIG_DIR:A}
 
 CASE_SENSITIVE=false
 HYPHEN_INSENSITIVE=true
