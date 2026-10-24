@@ -4,3 +4,6 @@
 [submodule "common/.config/tmux/plugins/tpm"]
 	path = common/.config/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "linux/.config/omarchy"]
+	path = linux/.config/omarchy
+	url = https://github.com/johnseth97/omarchy-config.git
