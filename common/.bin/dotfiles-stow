@@ -8,6 +8,8 @@ Usage: dotfiles-stow [--platform PLATFORM] [--dry-run] [--restow]
 Deploy this checkout's Stow packages to $HOME.
 
 Platforms: auto (default), macos, linux, wsl
+On a linux host with ID=omarchy in /etc/os-release, the 'omarchy' package
+is also layered on top of 'linux' automatically.
 EOF
 }
 
@@ -55,6 +57,14 @@ command -v stow >/dev/null 2>&1 || {
 
 packages=common
 [ -d "$repo_dir/$platform" ] && packages="$packages $platform"
+
+# Layer the 'omarchy' package on top of 'linux' only when this host is
+# actually running Omarchy (ID=omarchy in /etc/os-release). Other Linux
+# hosts (e.g. Fedora) share the plain 'linux' package and must never pick
+# up Hyprland-fork-specific bindings or the omarchy-shell config.
+if [ "$platform" = linux ] && [ -d "$repo_dir/omarchy" ] && grep -q '^ID=omarchy$' /etc/os-release 2>/dev/null; then
+  packages="$packages omarchy"
+fi
 
 set -- --dir "$repo_dir" --target "$HOME"
 [ "$dry_run" -eq 1 ] && set -- "$@" --simulate

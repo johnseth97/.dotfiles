@@ -13,6 +13,15 @@
 --   },
 -- })
 
+-- https://wiki.hypr.land/Configuring/Basics/Variables/#general
+hl.config({
+  general = {
+    -- 25% less than the default 10, which also narrows the gap between the
+    -- bar and its flyout panels (Style.gapsOut = gaps_out / 2).
+    gaps_out = 8,
+  },
+})
+
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#decoration
 hl.config({
   decoration = {
@@ -44,3 +53,8 @@ hl.config({
 --     column_width = 0.97,
 --   },
 -- })
+
+-- Opt another application in to Omarchy's standard transparency.
+-- Find its class with: hyprctl clients
+-- o.transparent_window("my-app")
+-- o.transparent_window("my-app", "0.9 0.85") -- Custom active/inactive opacity.
