@@ -691,7 +691,7 @@ self_test() {
     printf 'PASS: signing, encryption, signed encryption, exact round trips, tampering,\n'
     printf '      repair, multiple/mixed/incomplete blocks, missing keys, failed-output isolation,\n'
     printf '      temporary recipient imports, explicit saving, public-only export,\n'
-    printf '      default signing, unsigned opt-out, and missing-signing-key failure.\n' 
+    printf '      default signing, unsigned opt-out, and missing-signing-key failure.\n'
 }
 
 if [ "$operation" = test ]; then self_test; exit $?; fi
