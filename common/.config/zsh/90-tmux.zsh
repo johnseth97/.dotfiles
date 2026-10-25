@@ -31,3 +31,22 @@ if should_auto_tmux; then
     tmux new -s default || print -u2 -- '[tmux] new session failed; staying in shell'
   fi
 fi
+
+# Inside tmux, push this pane's git branch to the status bar at each prompt
+# (see status-left in tmux.conf) and hand back to its poll while a command
+# runs. Both run in the background so the prompt never waits on git.
+if [[ -n ${TMUX:-} && -n ${TMUX_PANE:-} ]]; then
+  _dotfiles_tmux_git_push() {
+    {
+      local segment
+      segment=$("${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/git-segment" "$PWD")
+      tmux set-option -p -t "$TMUX_PANE" @git "=$segment" \; refresh-client -S
+    } &>/dev/null &!
+  }
+  _dotfiles_tmux_git_release() {
+    tmux set-option -p -u -t "$TMUX_PANE" @git &>/dev/null &!
+  }
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _dotfiles_tmux_git_push
+  add-zsh-hook preexec _dotfiles_tmux_git_release
+fi
