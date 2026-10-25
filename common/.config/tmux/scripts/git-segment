@@ -1,0 +1,19 @@
+#!/bin/sh
+# Print a pane directory's git branch for the tmux status bar: branch name,
+# "*" when the worktree is dirty, and ↑/↓ commit counts against upstream.
+# Prints nothing outside a repository. One read-only `git status` per status
+# refresh; --no-optional-locks keeps it off the index lock.
+dir=${1:-$PWD}
+git -C "$dir" --no-optional-locks status --porcelain=v2 --branch 2>/dev/null | awk '
+  /^# branch.oid / { oid = substr($3, 1, 7) }
+  /^# branch.head / { head = $3 }
+  /^# branch.ab / { ahead = substr($3, 2) + 0; behind = substr($4, 2) + 0 }
+  /^[^#]/ { dirty = 1 }
+  END {
+    if (head == "") exit
+    if (head == "(detached)") head = oid
+    out = " " head (dirty ? "*" : "")
+    if (ahead) out = out " ↑" ahead
+    if (behind) out = out " ↓" behind
+    printf "%s", out
+  }'
