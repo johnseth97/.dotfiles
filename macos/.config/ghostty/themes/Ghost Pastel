@@ -1,0 +1,23 @@
+# Ghost Pastel by row-huh; converted from ~/.config/theme/colors.toml.
+# https://github.com/row-huh/omarchy-ghost-pastel-theme
+background = #070506
+foreground = #ffffff
+cursor-color = #ffffff
+selection-background = #979fec
+selection-foreground = #070506
+palette = 0=#070506
+palette = 1=#b37580
+palette = 2=#648ed0
+palette = 3=#e095b5
+palette = 4=#979fec
+palette = 5=#cd9dcf
+palette = 6=#7c93dd
+palette = 7=#d9b6fd
+palette = 8=#836f79
+palette = 9=#d5aeb5
+palette = 10=#a7c1e8
+palette = 11=#f6dbe6
+palette = 12=#e4e6fb
+palette = 13=#eddaee
+palette = 14=#c3cef2
+palette = 15=#ffffff

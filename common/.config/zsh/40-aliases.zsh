@@ -36,3 +36,7 @@ alias dots-sync='dots sync'
 alias dots-bootstrap='dots bootstrap'
 alias antidote-update='dots shell-update'
 alias notes-sync='sync-notes'
+
+# Other utilities
+alias mine='~/.dotfiles/common/.bin/mine.sh'
+alias wallet='monero-wallet-cli --wallet-file "${XMR_WALLET_FILE:?Set XMR_WALLET_FILE in ~/.dotfiles/.env.local}" --daemon-address "${XMR_DAEMON_ADDRESS:?Set XMR_DAEMON_ADDRESS in ~/.dotfiles/.env.local}" --daemon-ssl "${XMR_DAEMON_SSL:-enabled}" --daemon-ssl-allowed-fingerprints "${XMR_DAEMON_SSL_FINGERPRINT:?Set XMR_DAEMON_SSL_FINGERPRINT in ~/.dotfiles/.env.local}" --untrusted-daemon'

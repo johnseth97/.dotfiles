@@ -4,6 +4,17 @@
 # Disable the stupid fucking bell
 unsetopt BEEP
 
+# Clipboard access: preserve an existing user-provided paste helper.
+if (( ! $+aliases[paste] && ! $+functions[paste] )); then
+  if [[ -n ${WAYLAND_DISPLAY:-} ]] && (( $+commands[wl-paste] )); then
+    alias paste='wl-paste --no-newline'
+  elif (( $+commands[xclip] )); then
+    alias paste='xclip -selection clipboard -o'
+  elif (( $+commands[xsel] )); then
+    alias paste='xsel --clipboard --output'
+  fi
+fi
+
 [[ $- == *i* && -t 1 ]] && echo "🔹 Loading Linux config..."
 
 # Set 1Password SSH Agent if available

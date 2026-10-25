@@ -31,10 +31,14 @@ __pycache__/
 
 # User-Specific Config
 .env
+.env.local
 .history
 
 # Generated Assets
 themes/
+!/macos/.config/ghostty/themes/
+/macos/.config/ghostty/themes/*
+!/macos/.config/ghostty/themes/Ghost Pastel
 *.webp
 *.svg
 

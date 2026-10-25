@@ -25,3 +25,7 @@ OP_CONFIG_DIR=${OP_CONFIG_DIR:A}
 CASE_SENSITIVE=false
 HYPHEN_INSENSITIVE=true
 ENABLE_CORRECTION=true
+
+# Load machine-local environment variables
+[[ -f "$HOME/.dotfiles/.env.local" ]] &&
+  source "$HOME/.dotfiles/.env.local"

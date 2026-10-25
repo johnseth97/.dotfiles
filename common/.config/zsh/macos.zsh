@@ -28,6 +28,10 @@ esac
 export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
 export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"  # keg-only; some projects pin Node 22
+
+# Unity CLI
+[[ -f "$HOME/.unity/env" ]] && . "$HOME/.unity/env"
 
 # 1Password session setup. Persistent Git configuration is handled explicitly
 # by ~/.bin/bootstrap-git-signing, not during every interactive shell startup.

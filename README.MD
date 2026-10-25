@@ -85,6 +85,112 @@ dots shell-update     # update Homebrew Antidote and declared plugin bundles
 `dots shell-update` is intentionally explicit: it performs package/Git
 updates and should not run at every shell startup.
 
+### Portable PGP messages
+
+`common/.bin/pg.sh` is a standalone POSIX-shell utility using GnuPG, standard
+text utilities, and the commonly available `mktemp`. It has no Python dependency.
+Read stdin by default or use `--file PATH`. Signing, encryption, and decryption
+write only resulting content to stdout; diagnostics go to stderr.
+
+```sh
+pg.sh --verify < signed-message.asc
+pg.sh --sign < message.txt > signed-message.asc
+pg.sh --encrypt --recipient FINGERPRINT < message.txt > encrypted.asc
+pg.sh --sign --encrypt --self < message.txt | pg.sh --decrypt
+pg.sh --decrypt < encrypted.asc > message.txt
+pg.sh --self-test
+```
+
+The Zsh clipboard wrappers use your existing `paste` alias or function:
+
+```zsh
+pgpaste                    # Detect, verify, or decrypt clipboard PGP blocks
+pgsign                     # Clear-sign the clipboard with your default identity
+pgencrypt                  # Sign and encrypt clipboard; choose a recipient
+pgencrypt FINGERPRINT       # Sign and encrypt; skip the picker
+pgencrypt --unsigned        # Explicitly encrypt without signing
+pgencrypt --self            # Encrypt to yourself (pghide is another name)
+pgsign --encrypt            # Sign and encrypt; recipient picker if needed
+pgopen                     # Decrypt clipboard; verify embedded signatures
+pgcopy                     # Copy your PUBLIC certificate to share
+pgcopy --key FINGERPRINT    # Choose which of your identities to share
+pgencrypt --help            # Colored usage and a short PGP explanation
+```
+
+The encryption picker lists usable recipient keys with identities/fingerprints.
+It also accepts a public key from the clipboard, a path to a key file or directory,
+or your own identity. Directory selection inspects immediate files for keys rather
+than relying on filename extensions. The message is captured **before** prompting,
+so copying a recipient key cannot replace the message. Selecting a fingerprint
+chooses a recipient; it does not establish trust in that key's claimed identity.
+
+The standalone script uses `PG_CLIPBOARD_COMMAND` for the clipboard-key picker;
+for example `PG_CLIPBOARD_COMMAND='wl-paste --no-newline'`. The wrappers set this
+from your existing paste helper. On Linux, clipboard access still needs `wl-paste`,
+`xclip`, or `xsel`; the core script has no clipboard dependency. For noninteractive
+imports, combine `--recipient-file FILE` with `--recipient FINGERPRINT`.
+
+Encryption signs by default, including the standalone `--encrypt` operation.
+Use `--unsigned` to opt out; it conflicts with explicit `--sign`. An unavailable
+signing identity causes failure, never a silent downgrade to unsigned encryption.
+
+`pgcopy` selects your default identity (or `--key`) and copies only its armored
+public certificate, including public signing/encryption subkeys. It never exports
+secret keys. It uses `PG_COPY_COMMAND`, a `copy` alias/function, or an available
+`pbcopy`, `wl-copy`, `xclip`, or `xsel` backend. Failed export leaves the clipboard
+unchanged. The standalone equivalent is `pg.sh --export-public [--key ID]`, which
+writes public armor to stdout. Never share private keys: private encryption keys
+can decrypt your messages; private signing keys can impersonate your signatures.
+Public signing keys are safe to share and let others verify your messages.
+
+All clipboard wrappers accept `--help` without reading or changing the clipboard.
+Help explains PGP and key sharing, uses terminal colors, and respects `NO_COLOR`.
+
+Signing respects GPG's `default-key` or an explicit `--key ID`; without either,
+a single usable private identity is required. Private keys and passphrases remain
+with your normal GPG agent/pinentry. Decryption buffers its output until GPG has
+successfully decrypted and checked any embedded signature. Failed operations
+release no plaintext. Unknown signing keys can be retrieved temporarily on retry.
+
+`pgpaste` (standalone `--auto`, also the default) recognizes both clear-signed and
+encrypted armored blocks, including mixtures surrounded by other text. Encrypted
+blocks are decrypted and embedded signatures checked; signed results show the
+signer and plaintext. Unsigned encrypted messages are labeled unsigned with red
+`UNVERIFIED` bodies. Decryption/signature failures withhold plaintext and do not
+stop later blocks. `pgopen`/`--decrypt` still emits exact plaintext for pipelines.
+Use `pgpaste --verify` to restrict processing to clear-signed blocks. `--raw` and
+`--repair` apply only to clear-signed armor; encrypted blocks go directly to GPG.
+
+Verification retains trimming, multiple numbered messages, conservative armor
+repair, colored summaries, and red `UNVERIFIED` bodies. Body line breaks are never
+reconstructed. Incomplete blocks are flagged; every block must verify for success.
+`--raw` disables repair, `--repair` tries only the repaired form, `--verbose` shows
+GPG diagnostics, and `--quiet` suppresses verification reports and prompts.
+`NO_COLOR` disables colors; redirected output is plain text.
+
+Public keys from files, the clipboard, or verification lookups go into a temporary
+keyring. By default the script offers to save newly imported keys when a terminal
+is available; `--save-keys` explicitly saves them and `--no-save` disables the offer.
+Saving imports only public material and does not assign identity trust. Temporary
+keys are reused across messages and removed on exit. Without a terminal, keys stay
+temporary unless `--save-keys` is supplied.
+
+Missing verification keys are looked up on `hkps://keys.openpgp.org`; this sends
+the signing-key identifier to that server. Override with `PG_KEYSERVER`, or use
+`--offline` to disable lookup. Failed lookup/import does not prove a key is unknown
+everywhere. Some keys on that server lack a verified user ID and cannot be imported
+by GPG. A good signature verifies the message against the key, not its owner.
+
+`--self-test` generates a disposable identity and tests signing, encryption,
+signed encryption, exact plaintext round trips, repair, multiple/mixed/incomplete
+blocks, missing keys, and tamper rejection. It uses no personal keys or network.
+
+After updating these files, reload wrappers in existing Zsh sessions:
+
+```zsh
+source ~/.config/zsh/50-functions.zsh
+```
+
 ### Tmux and Sesh projects
 
 Zsh initializes zoxide, so directories visited through `z` automatically

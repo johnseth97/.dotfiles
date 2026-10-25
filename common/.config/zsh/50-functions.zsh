@@ -1,5 +1,105 @@
 # Interactive functions.
 
+# Clipboard front ends to the standalone POSIX pg.sh utility. Capture first:
+# the recipient picker may ask you to replace the clipboard with a public key.
+_pgclipboard() {
+  local option
+  for option in "$@"; do
+    if [[ $option == --help || $option == -h ]]; then
+      command "$HOME/.bin/pg.sh" --help
+      return $?
+    fi
+  done
+  if (( ! $+aliases[paste] && ! $+functions[paste] )); then
+    print -u2 -- 'pg: define a clipboard paste alias/function first.'
+    return 127
+  fi
+  local message_file backend function_source
+  message_file=$(mktemp "${TMPDIR:-/tmp}/pg-clipboard.XXXXXXXX") || return 1
+  if [[ -n ${PG_CLIPBOARD_COMMAND:-} ]]; then
+    backend=$PG_CLIPBOARD_COMMAND
+  elif (( $+aliases[paste] )); then
+    # Run trusted shell configuration in Zsh, so complex aliases still work.
+    backend="zsh -fc ${(q)aliases[paste]}"
+  else
+    function_source="$(functions paste)"$'\n''paste'
+    backend="zsh -fc ${(q)function_source}"
+  fi
+  {
+    eval 'paste' > "$message_file" || {
+      print -u2 -- 'pg: clipboard read failed.'
+      return 1
+    }
+    PG_CLIPBOARD_COMMAND=$backend command "$HOME/.bin/pg.sh" "$@" --file "$message_file"
+  } always {
+    command rm -f -- "$message_file"
+  }
+}
+
+pgpaste() { _pgclipboard --auto "$@"; }
+pgsign() { _pgclipboard --sign "$@"; }
+pgencrypt() {
+  if (( $# )) && [[ $1 != -* ]]; then
+    local recipient=$1
+    shift
+    _pgclipboard --encrypt --recipient "$recipient" "$@"
+  else
+    _pgclipboard --encrypt "$@"
+  fi
+}
+pghide() { pgencrypt "$@"; }
+pgopen() { _pgclipboard --decrypt "$@"; }
+
+# Export first, then copy only on success: failed selection leaves clipboard intact.
+pgcopy() {
+  local option public_file
+  for option in "$@"; do
+    if [[ $option == --help || $option == -h ]]; then
+      command "$HOME/.bin/pg.sh" --help
+      return $?
+    fi
+  done
+  local expect_key=false
+  for option in "$@"; do
+    if $expect_key; then
+      expect_key=false
+      continue
+    fi
+    case $option in
+      --key) expect_key=true ;;
+      --verbose|-v) ;;
+      *) print -u2 -- 'Usage: pgcopy [--key ID] [--verbose]'; return 2 ;;
+    esac
+  done
+  if $expect_key; then
+    print -u2 -- 'pgcopy: --key needs an identity.'
+    return 2
+  fi
+  public_file=$(mktemp "${TMPDIR:-/tmp}/pg-public.XXXXXXXX") || return 1
+  {
+    command "$HOME/.bin/pg.sh" --export-public "$@" > "$public_file" || return $?
+    if [[ -n ${PG_COPY_COMMAND:-} ]]; then
+      command sh -c "$PG_COPY_COMMAND" < "$public_file" || return $?
+    elif (( $+aliases[copy] || $+functions[copy] )); then
+      eval 'copy' < "$public_file" || return $?
+    elif [[ $OSTYPE == darwin* ]] && (( $+commands[pbcopy] )); then
+      command pbcopy < "$public_file" || return $?
+    elif [[ -n ${WAYLAND_DISPLAY:-} ]] && (( $+commands[wl-copy] )); then
+      command wl-copy < "$public_file" || return $?
+    elif (( $+commands[xclip] )); then
+      command xclip -selection clipboard -i < "$public_file" || return $?
+    elif (( $+commands[xsel] )); then
+      command xsel --clipboard --input < "$public_file" || return $?
+    else
+      print -u2 -- 'pgcopy: configure copy/PG_COPY_COMMAND or install a clipboard writer.'
+      return 127
+    fi
+    print -u2 -- 'pgcopy: public certificate copied. Share it; keep private keys private.'
+  } always {
+    command rm -f -- "$public_file"
+  }
+}
+
 ghostty-setup() {
   local host=${1:?usage: ghostty-setup user@host}
   infocmp -x | ssh "$host" -- tic -x -

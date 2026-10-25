@@ -1,11 +1,12 @@
 # Render Starship's config through a cache, rebuilt only when its inputs
-# change: recoloured with exact Omarchy theme colours when there is a theme,
+# change: recoloured with Omarchy or the host's shared palette when present,
 # and inside tmux without the git branch/status modules, which the tmux
 # status bar's git pill already shows. Outside tmux (SSH, editor terminals,
 # NO_TMUX) the prompt keeps them. The portable Starship config stays untouched.
 _dotfiles_starship_palette() {
   local base="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
   local theme="$HOME/.local/state/omarchy/current/theme/colors.toml"
+  [[ -r $theme ]] || theme="${XDG_CONFIG_HOME:-$HOME/.config}/theme/colors.toml"
   local cache="${XDG_CACHE_HOME:-$HOME/.cache}/starship"
   local target="$cache/prompt${TMUX:+-tmux}.toml"
   [[ -r $base ]] || return 0
@@ -18,7 +19,7 @@ _dotfiles_starship_palette() {
   local -A base_stat theme_stat
   zstat -H base_stat "$base" 2>/dev/null || return 0
   [[ -r $theme ]] && zstat -H theme_stat "$theme" 2>/dev/null
-  local stamp="${base_stat[inode]}:${base_stat[mtime]}:${base_stat[size]}:${theme_stat[inode]}:${theme_stat[mtime]}:${theme_stat[size]}"
+  local stamp="v2:$theme:${base_stat[inode]}:${base_stat[mtime]}:${base_stat[size]}:${theme_stat[inode]}:${theme_stat[mtime]}:${theme_stat[size]}"
   if [[ $stamp != ${_dotfiles_starship_palette_stamp:-} || ! -f $target ]]; then
     python3 - "$base" "$theme" "$target" "${TMUX:+tmux}" <<'PY'
 import os
@@ -31,20 +32,21 @@ import tomllib
 
 
 def theme_colors(path):
-    """colors.toml, plus the named slots Omarchy derives from it.
-
-    Many themes define only color0-15/accent; omarchy-theme-color maps those
-    onto names such as blue and magenta (as the tmux palette hook does)."""
+    """Named palette slots, with ANSI fallbacks for hosts without Omarchy."""
     colors = tomllib.loads(path.read_text())
     try:
         derived = subprocess.run(['omarchy-theme-color', '--file', str(path), '--all'],
                                  capture_output=True, text=True, timeout=5).stdout
     except (OSError, subprocess.SubprocessError):
-        return colors
+        derived = ''
     for line in derived.splitlines():
         key, _, value = line.partition('\t')
         if value:
             colors.setdefault(key, value)
+    for name, index in {'red': 1, 'green': 2, 'yellow': 3, 'blue': 4,
+                        'magenta': 5, 'cyan': 6}.items():
+        if f'color{index}' in colors:
+            colors.setdefault(name, colors[f'color{index}'])
     return colors
 
 
