@@ -24,9 +24,29 @@ _dotfiles_starship_palette() {
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tempfile
 import tomllib
+
+
+def theme_colors(path):
+    """colors.toml, plus the named slots Omarchy derives from it.
+
+    Many themes define only color0-15/accent; omarchy-theme-color maps those
+    onto names such as blue and magenta (as the tmux palette hook does)."""
+    colors = tomllib.loads(path.read_text())
+    try:
+        derived = subprocess.run(['omarchy-theme-color', '--file', str(path), '--all'],
+                                 capture_output=True, text=True, timeout=5).stdout
+    except (OSError, subprocess.SubprocessError):
+        return colors
+    for line in derived.splitlines():
+        key, _, value = line.partition('\t')
+        if value:
+            colors.setdefault(key, value)
+    return colors
+
 
 base, theme, target = map(Path, sys.argv[1:4])
 in_tmux = sys.argv[4] == 'tmux'
@@ -35,7 +55,7 @@ try:
     config = tomllib.loads(source)
     palette = config['palettes']['omarchy'].copy()
     if theme.is_file():
-        colors = tomllib.loads(theme.read_text())
+        colors = theme_colors(theme)
         for key in palette:
             value = colors.get(key, palette[key])
             if not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value):
