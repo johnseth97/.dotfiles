@@ -1,20 +1,26 @@
-# Resolve exact Omarchy colours once per theme/config change, not per module.
-# Keep the portable Starship config untouched and render through a cache.
+# Render Starship's config through a cache, rebuilt only when its inputs
+# change: recoloured with exact Omarchy theme colours when there is a theme,
+# and inside tmux without the git branch/status modules, which the tmux
+# status bar's git pill already shows. Outside tmux (SSH, editor terminals,
+# NO_TMUX) the prompt keeps them. The portable Starship config stays untouched.
 _dotfiles_starship_palette() {
   local base="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
   local theme="$HOME/.local/state/omarchy/current/theme/colors.toml"
-  local target="${XDG_CACHE_HOME:-$HOME/.cache}/starship/omarchy.toml"
-  [[ -r $base && -r $theme ]] || return 0
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/starship"
+  local target="$cache/prompt${TMUX:+-tmux}.toml"
+  [[ -r $base ]] || return 0
+  [[ -r $theme || -n ${TMUX:-} ]] || return 0
   (( $+commands[python3] )) || return 0
-  # Respect an explicitly selected alternate Starship configuration.
-  [[ -z ${STARSHIP_CONFIG:-} || $STARSHIP_CONFIG == $target || $STARSHIP_CONFIG == $base ]] || return 0
+  # Respect an explicitly selected alternate Starship configuration. Either
+  # cache may arrive inherited, e.g. by a tmux server started from a shell.
+  [[ -z ${STARSHIP_CONFIG:-} || $STARSHIP_CONFIG == $base || $STARSHIP_CONFIG == $cache/* ]] || return 0
   zmodload -F zsh/stat b:zstat
   local -A base_stat theme_stat
   zstat -H base_stat "$base" 2>/dev/null || return 0
-  zstat -H theme_stat "$theme" 2>/dev/null || return 0
+  [[ -r $theme ]] && zstat -H theme_stat "$theme" 2>/dev/null
   local stamp="${base_stat[inode]}:${base_stat[mtime]}:${base_stat[size]}:${theme_stat[inode]}:${theme_stat[mtime]}:${theme_stat[size]}"
   if [[ $stamp != ${_dotfiles_starship_palette_stamp:-} || ! -f $target ]]; then
-    python3 - "$base" "$theme" "$target" <<'PY'
+    python3 - "$base" "$theme" "$target" "${TMUX:+tmux}" <<'PY'
 import os
 from pathlib import Path
 import re
@@ -22,19 +28,30 @@ import sys
 import tempfile
 import tomllib
 
-base, theme, target = map(Path, sys.argv[1:])
+base, theme, target = map(Path, sys.argv[1:4])
+in_tmux = sys.argv[4] == 'tmux'
 try:
     source = base.read_text()
     config = tomllib.loads(source)
-    colors = tomllib.loads(theme.read_text())
     palette = config['palettes']['omarchy'].copy()
-    for key in palette:
-        value = colors.get(key, palette[key])
-        if not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value):
-            raise ValueError('Invalid theme colour: ' + key)
-        palette[key] = value
+    if theme.is_file():
+        colors = tomllib.loads(theme.read_text())
+        for key in palette:
+            value = colors.get(key, palette[key])
+            if not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value):
+                raise ValueError('Invalid theme colour: ' + key)
+            palette[key] = value
     # The fallback palette is deliberately the final table in the source.
     source = source.split('[palettes.omarchy]', 1)[0]
+    if in_tmux:
+        for module in ('git_branch', 'git_status'):
+            if 'disabled' in config.get(module, {}):
+                continue  # an explicit choice in starship.toml wins
+            header = re.compile(r'^\[' + module + r'\][ \t]*$', re.M)
+            if header.search(source):
+                source = header.sub(lambda m: m.group(0) + '\ndisabled = true', source, count=1)
+            else:
+                source += f'\n[{module}]\ndisabled = true\n'
     source += '[palettes.omarchy]\n' + ''.join(
         f'{key} = "{value}"\n' for key, value in palette.items())
     tomllib.loads(source)
