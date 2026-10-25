@@ -13,3 +13,6 @@ o.window(
 
 -- Leave spare columns for the 81-column Omarchy logo with Berkeley Mono.
 o.window("org.omarchy.terminal", { size = { 915, 600 }, min_size = { 915, 600 } })
+
+-- Roughly twice the area of Omarchy's default 875x600 floating TUI.
+o.window("^org\\.omarchy\\.btop$", { tag = "-floating-window", float = true, center = true, size = { 1250, 840 } })
