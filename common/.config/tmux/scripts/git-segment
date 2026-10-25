@@ -1,26 +1,44 @@
 #!/bin/sh
-# Record a pane directory's git state for the tmux status bar in two pane
-# options: @git_branch (branch, plus ↑/↓ commit counts against upstream) and
-# @git_state (clean, dirty or conflict), which status-right turns into the
-# git pill's colour. Both are empty outside a repository. Prints nothing, so
-# it serves as a status-line #() job as well as zsh's precmd hook.
-# --no-optional-locks keeps the read-only `git status` off the index lock.
+# Record a pane directory's git state for the tmux status bar in three pane
+# options: @git_branch, @git_state (clean, dirty or conflict), which
+# status-right turns into the git pill's colour, and @git_flags, Starship's
+# git_status symbols for what the colour doesn't say, in Starship's order:
+# $ stashed, ✘ deleted, » renamed, ! modified, + staged, ? untracked, then
+# ⇕ diverged / ⇡ ahead / ⇣ behind. All are empty outside a repository.
+# Prints nothing, so it serves as a status-line #() job as well as zsh's
+# precmd hook. --no-optional-locks keeps the read-only `git status` off the
+# index lock.
 pane=$1
 dir=${2:-$PWD}
-info=$(git -C "$dir" --no-optional-locks status --porcelain=v2 --branch 2>/dev/null | awk '
+info=$(git -C "$dir" --no-optional-locks status --porcelain=v2 --branch --show-stash 2>/dev/null | awk '
   /^# branch.oid / { oid = substr($3, 1, 7) }
   /^# branch.head / { head = $3 }
   /^# branch.ab / { ahead = substr($3, 2) + 0; behind = substr($4, 2) + 0 }
+  /^# stash / { stashed = 1 }
   /^u / { conflict = 1 }
-  /^[^#]/ { dirty = 1 }
+  /^\? / { untracked = 1 }
+  /^[12] / {
+    x = substr($2, 1, 1); y = substr($2, 2, 1)
+    if (x == "D" || y == "D") deleted = 1
+    if ($1 == "2") renamed = 1
+    if (y == "M" || y == "T") modified = 1
+    if (x == "A" || x == "M" || x == "T") staged = 1
+  }
   END {
     if (head == "") exit
     if (head == "(detached)") head = oid
-    if (ahead) head = head " ↑" ahead
-    if (behind) head = head " ↓" behind
-    printf "%s\t%s", conflict ? "conflict" : dirty ? "dirty" : "clean", head
+    # Yellow only alongside a symbol saying why, so colour and flags agree.
+    dirty = deleted || renamed || modified || staged || untracked
+    flags = (stashed ? "$" : "") (deleted ? "✘" : "") (renamed ? "»" : "") \
+      (modified ? "!" : "") (staged ? "+" : "") (untracked ? "?" : "") \
+      (ahead && behind ? "⇕" : ahead ? "⇡" : behind ? "⇣" : "")
+    printf "%s\t%s\t%s", conflict ? "conflict" : dirty ? "dirty" : "clean", head, flags
   }')
 tab=$(printf '\t')
 state=${info%%"$tab"*}
-branch=${info#*"$tab"}
-tmux set-option -p -t "$pane" @git_state "$state" \; set-option -p -t "$pane" @git_branch "$branch"
+rest=${info#*"$tab"}
+branch=${rest%%"$tab"*}
+flags=${rest#*"$tab"}
+tmux set-option -p -t "$pane" @git_state "$state" \; \
+  set-option -p -t "$pane" @git_branch "$branch" \; \
+  set-option -p -t "$pane" @git_flags "$flags"
