@@ -91,6 +91,9 @@ fi
 
 if (( $+commands[zoxide] )); then
   eval "$(zoxide init zsh)"
+  eval "$(zoxide init zsh --cmd cd)"
+elif [[ $- == *i* && -t 1 ]]; then
+  print -u2 -- "zoxide not installed, please install, as cd aliases zoxide in this terminal!"
 fi
 
 if (( $+commands[sesh] )); then
@@ -117,7 +120,4 @@ _dotfiles_transient_prompt() {
 }
 autoload -Uz add-zle-hook-widget
 add-zle-hook-widget line-finish _dotfiles_transient_prompt
-
-# zoxide
-eval "$(zoxide init zsh --cmd cd)"
 

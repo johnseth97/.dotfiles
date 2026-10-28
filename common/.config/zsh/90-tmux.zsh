@@ -5,6 +5,11 @@ should_auto_tmux() {
   [[ -n "$TMUX" ]] && return 1
   [[ -n "$SSH_CONNECTION" ]] && return 1
   [[ -t 1 ]] || return 1
+  # `zsh -i -c CMD` must run CMD, not attach. Zed's WSL terminals start as
+  # `zsh -i -c 'exec env TERM_PROGRAM=zed ... zsh -l'` from WSL's /init relay,
+  # so this wrapper has a pty but none of Zed's env vars yet.
+  [[ -n "${ZSH_EXECUTION_STRING:-}" ]] && return 1
+  [[ -n "${ZED_TERM:-}" || -n "${INTEGRATED_TERMINAL:-}" ]] && return 1
   [[ "${NO_TMUX:-}" == 1 ]] && return 1
   [[ "${AI_AGENT_NO_TMUX:-}" == 1 ]] && return 1
   [[ "${DISABLE_AUTO_TMUX:-}" == 1 ]] && return 1
