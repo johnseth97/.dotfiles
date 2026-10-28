@@ -31,3 +31,20 @@ export PATH="$PATH:/opt/mssql-tools18/bin"
 # WSL/Fedora development tools.
 export PATH="$HOME/.aspire/bin:$PATH"
 export SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust:/etc/pki/tls/certs"
+
+# Podman is the container runtime: the Windows Podman machine (rootful, the
+# Windows default connection), reached through the socket it publishes to WSL.
+# The podman CLI here runs as a remote client; the docker CLI and Docker-API
+# tools (e.g. Testcontainers) use the same engine. Aspire ignores shell aliases:
+# it needs a real `podman` on PATH plus ASPIRE_CONTAINER_RUNTIME.
+export ASPIRE_CONTAINER_RUNTIME=podman
+_podman_sock=/mnt/wsl/podman-sockets/podman-machine-default/podman-root.sock
+if [[ -S "$_podman_sock" ]]; then
+  export CONTAINER_HOST="unix://$_podman_sock"
+  export DOCKER_HOST="unix://$_podman_sock"
+fi
+unset _podman_sock
+if command -v podman >/dev/null 2>&1; then
+  alias docker='podman'
+  alias docker-compose='podman compose'
+fi

@@ -5,6 +5,12 @@ export PATH="$HOME/.bin:$PATH"
 export SCRIPTS="$HOME/.scripts"
 export PATH="$SCRIPTS:$PATH"
 
+# `go install` drops binaries in $GOPATH/bin (~/go/bin by default; GOBIN is
+# unset). This has to live here rather than in 99-toolchains: 30-integrations
+# gates sesh's completion init on `$+commands[sesh]`, so a later PATH edit
+# would leave that fragment silently skipping.
+export PATH="$HOME/go/bin:$PATH"
+
 export EDITOR=nvim
 export VISUAL=nvim
 export PAGER='nvim +Man!'
