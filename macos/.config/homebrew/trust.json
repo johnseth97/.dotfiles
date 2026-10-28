@@ -19,7 +19,8 @@
     "gromgit/fuse/sshfs-mac",
     "johnseth97/brew-watchtower/brew-watchtower",
     "matheusml/zsh-ai/zsh-ai",
-    "mostlygeek/llama-swap/llama-swap"
+    "mostlygeek/llama-swap/llama-swap",
+    "thomas-mauran/tap/chess-tui"
   ],
   "trustedcasks": [
     "johnseth97/inductive-automation/ignition-designer-launcher",

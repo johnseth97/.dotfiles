@@ -28,6 +28,70 @@ style = 'bold fg:background bg:magenta'
 format = '(─[](yellow)[ $all_status$ahead_behind ]($style)[](yellow))'
 style = 'fg:background bg:yellow'
 
+# Toolchain capsules. These render straight after the directory/git chain, so
+# each carries its own ─ seam the way git_branch and git_status do. Starship's
+# stock formats are bare `via [$symbol$version]` with no leading separator,
+# which butts the text up against the preceding capsule's right edge. Inside
+# tmux the git modules are stripped (35-prompt-palette.zsh) and these join
+# directly onto the directory capsule — the seam is correct either way.
+# Any module left at its default format reintroduces the collision; give new
+# ones the same treatment rather than relying on a space.
+[dotnet]
+format = '─[](green)[ $symbol$version( 🎯 $tfm) ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[rust]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[c]
+format = '─[](green)[ $symbol($name $version) ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[cpp]
+format = '─[](green)[ $symbol($name $version) ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[python]
+format = '─[](green)[ $symbol$pyenv_prefix$version( \($virtualenv\)) ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[nodejs]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[golang]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[java]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[lua]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[ruby]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[zig]
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[terraform]
+format = '─[](green)[ $symbol$workspace ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[docker_context]
+format = '─[](green)[ $symbol$context ]($style)[](green)'
+style = 'bold fg:background bg:green'
+
+[jobs]
+format = '─[](cyan)[ $symbol$number ]($style)[](cyan)'
+style = 'bold fg:background bg:cyan'
+
 [character]
 format = "$symbol "
 success_symbol = '[❯](bold green)'
@@ -51,6 +115,8 @@ min_time_to_notify = 45_000
 
 [package]
 disabled = false
+format = '─[](green)[ $symbol$version ]($style)[](green)'
+style = 'bold fg:background bg:green'
 
 [aws]
 disabled = true
@@ -61,6 +127,8 @@ disabled = true
 [sudo]
 disabled = false
 symbol = '👨🏼‍💻 '
+format = '─[](red)[ $symbol]($style)[](red)'
+style = 'bold fg:background bg:red'
 
 # Keep this palette last: the generated cache replaces it with Omarchy colours.
 [palettes.omarchy]
