@@ -22,6 +22,10 @@ export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 export OP_CONFIG_DIR="${DOTFILES_ZSH_DIR:h}/op"
 OP_CONFIG_DIR=${OP_CONFIG_DIR:A}
 
+# Ghidra (Homebrew formula); used by REA and analyzeHeadless tooling.
+[[ -d /opt/homebrew/opt/ghidra/libexec ]] &&
+  export GHIDRA_INSTALL_DIR=/opt/homebrew/opt/ghidra/libexec
+
 CASE_SENSITIVE=false
 HYPHEN_INSENSITIVE=true
 ENABLE_CORRECTION=true
